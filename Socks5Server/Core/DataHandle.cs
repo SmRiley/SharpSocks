@@ -151,7 +151,7 @@ namespace Socks5Server
                         Bytes_Port = (Data.Skip(8).Take(2).ToArray());
                     }
                     Port = (Bytes_Port[0] << 8) + Bytes_Port[1];
-                    Console.WriteLine(string.Format("解析IP:{0},Port:{1}", Host_IP, Port));
+                    Program.PrintLog(string.Format("解析IP:{0},Port:{1}", Host_IP, Port));
                     return (Data[1], Host_IP, Port);
                 }
             }
