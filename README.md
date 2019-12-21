@@ -12,7 +12,7 @@
 
 2. Cross platform based on. Net core 3.0, which can be deployed across platforms, runs well in the test environment
 
-###Functions to be developed
+### Functions to be developed
 
 1. Encrypted stream
 
