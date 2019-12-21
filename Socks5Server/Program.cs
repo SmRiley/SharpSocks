@@ -8,7 +8,7 @@ namespace Socks5Server
     {
         static void Main(string[] args)
         {
-            new Socsk_Listen(IPAddress.Any, 1080);
+            new TCP_Listen(IPAddress.Any, 1080);
             Task.Delay(-1).Wait();
         }
 

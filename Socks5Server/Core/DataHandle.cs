@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Net;
 using System.Net.NetworkInformation;
@@ -9,28 +10,28 @@ using System.Net.Sockets;
 
 namespace Socks5Server
 {
-    class DataHandle
+    class Datahandle
     {
 
         /// <summary>
         /// 无需验证
         /// </summary>
-        public byte[] No_Authentication_Required = new byte[] { 5, 0 };
+        static public byte[] No_Authentication_Required = new byte[] { 5, 0 };
 
-        public byte[] Connect_Fail = new byte[] { 5, 0xFF };
+        static public byte[] Connect_Fail = new byte[] { 5, 0xFF };
 
         /// <summary>
         /// 需要身份验证
         /// </summary>
-        public byte[] Authentication_Required = new byte[] { 5, 2 };
+        static public byte[] Authentication_Required = new byte[] { 5, 2 };
 
         /// <summary>
         /// 身份验证成功
         /// </summary>
-        public byte[] Authentication_Success = new byte[] { 1, 0 };
+        static public byte[] Authentication_Success = new byte[] { 1, 0 };
 
-        public byte[] Proxy_Success = new byte[] { 5, 0, 0, 1, 0, 0, 0, 0, 0, 0 };
-        public byte[] Proxy_Error = new byte[] { 5, 1, 0, 1, 0, 0, 0, 0, 0, 0 };
+        static public byte[] Proxy_Success = new byte[] { 5, 0, 0, 1, 0, 0, 0, 0, 0, 0 };
+        static public byte[] Proxy_Error = new byte[] { 5, 1, 0, 1, 0, 0, 0, 0, 0, 0 };
 
         /// <summary>
         /// 
@@ -38,46 +39,55 @@ namespace Socks5Server
         /// <param name="Data"></param>
         /// <returns>
         /// 1.建立连接请求
-        /// 2.转发请求TCP(IP)
+        /// 2.转发请求TCP(IPV4)
         /// 3.转发请求TCP(域名)
-        /// 4.转发请求UDP(IP)
-        /// 5.转发请求UDP(域名)
-        /// 6.其它
+        /// 4.转发请求TCP(IPV6)
+        /// 5.转发请求UDP(IPV4)
+        /// 6.转发请求UDP(域名)
+        /// 7.转发请求UDP(IPV6)
+        /// 0.其它
         /// </returns>
-        public int Get_Which_Type(byte[] Data)
+        static public int Get_Which_Type(byte[] Data)
         {
-
+            int Type = 0;
             if (Data.Length > 2 && Data.Length == Data[1] + 2)
             {
-                return 1;
+                Type = 1;
             }
-            else if (Data.Length > 8 && Data[1] == (byte)1)
+            else if (Data.Length > 8)
             {
-                ///TCP请求
-                if (Data[3] == (byte)1 && Data.Length == 10)
+                if (Data[1] == 1)
                 {
-                    return 2;
-                }
-                else if (Data[3] == (byte)3 && +Data.Length == (Data.Skip(5).Take(Data[4]).Count() + 7))
-                {
-                    return 3;
+                    ///TCP请求
+                    if (Data[3] == 1 && Data.Length == 10)
+                    {
+                        Type = 2;
+                    }
+                    else if (Data[3] == 3 && Data.Length == (Data.Skip(5).Take(Data[4]).Count() + 7))
+                    {
+                        Type = 3;
+                    }
+                    else if (Data[3] == 4 && Data.Length == 22) {
+                        Type = 4;
+                    }
+                } else if (Data[1] == 3) {
+                    //UDP请求或转发
+                    if (Data[3] == 1 && Data.Length == 10)
+                    {
+                        Type = 5;
+                    }
+                    else if (Data[3] == 3 && Data.Length == (Data.Skip(5).Take(Data[4]).Count() + 7))
+                    {
+                        Type = 6;
+                    }
+                    else if (Data[3] == 4 && Data.Length == 22)
+                    {
+                        Type = 7;
+                    }
                 }
             }
-            else if (Data.Length > 8 && Data[1] == (byte)3)
-            {
-                //UDP请求
-                if (Data[3] == (byte)1 && Data.Length == 10)
-                {
-                    return 4;
-                }
-                else if (Data[3] == (byte)3 && +Data.Length == (Data.Skip(5).Take(Data[4]).Count() + 7))
-                {
-                    return 5;
-                }
 
-            }
-
-            return 6;
+            return Type;
 
 
         }
@@ -88,7 +98,7 @@ namespace Socks5Server
         /// </summary>
         /// <param name="Data"></param>
         /// <returns></returns>
-        public byte[] Get_Checking_Method(byte[] Data)
+        static public byte[] Get_Checking_Method(byte[] Data)
         {
             if (Get_Which_Type(Data) == 1)
             {
@@ -112,110 +122,118 @@ namespace Socks5Server
         /// string IP
         /// int PORT
         /// </returns>
-        public (int type, string IP, int port) Get_Request_Info(byte[] Data)
+        static public(int type, IPAddress IP, int port) Get_Request_Info(byte[] Data)
         {
-            string Host_IP = "";
+            IPAddress Host_IP = null;
             int Port = 0;
             byte[] Bytes_Port = new byte[2];
             int Which_Type = Get_Which_Type(Data);
             try
             {
-                if (1 < Which_Type && Which_Type < 6)
+                if (1 < Which_Type)
                 {
-                    if (Which_Type == 2 || Which_Type == 4)
-                    {
-                        byte[] IP = Data.Skip(4).Take(4).ToArray();
-                        for (int i = 0; i < IP.Length; i++)
-                        {
-                            if (i < 3)
-                            {
-                                Host_IP += IP[i].ToString() + ".";
-                            }
-                            else
-                            {
-                                Host_IP += IP[i].ToString();
-                            }
-                        }
-                        Bytes_Port = (Data.Skip(8).Take(2).ToArray());
 
+                    if (new List<int> { 2, 5 }.Contains(Which_Type))
+                    {
+                        //IPV4
+                        Host_IP = new IPAddress(Data.Skip(4).Take(4).ToArray());
+                        Bytes_Port = (Data.Skip(8).Take(2).ToArray());
                     }
-                    else if (Which_Type == 5 || Which_Type == 3)
+                    else if (new List<int> { 3, 6 }.Contains(Which_Type))
                     {
                         //域名解析IP
-                        Host_IP = Dns.GetHostEntry(Encoding.UTF8.GetString(Data.Skip(5).Take(Data[4]).ToArray())).AddressList[0].ToString();
+                        Host_IP = Dns.GetHostEntry(Encoding.UTF8.GetString(Data.Skip(5).Take(Data[4]).ToArray())).AddressList[0];
                         Bytes_Port = (Data.Skip(5 + Data[4]).Take(2).ToArray());
                     }
+                    else if (new List<int> { 4, 7 }.Contains(Which_Type)) {
+                        //IPV6
+                        Host_IP = new IPAddress(Data.Skip(4).Take(16).ToArray());
+                        Bytes_Port = (Data.Skip(8).Take(2).ToArray());
+                    }
                     Port = (Bytes_Port[0] << 8) + Bytes_Port[1];
-                    Console.WriteLine(Host_IP + "," + Port);
+                    Console.WriteLine(string.Format("解析IP:{0},Port:{1}", Host_IP, Port));
                     return (Data[1], Host_IP, Port);
                 }
             }
             catch
             {
-
+                
             }
-            return (0, "", 0);
+            return (0,IPAddress.Parse("127.0.0.1"), 0);
         }
-
 
         /// <summary>
-        /// 转发请求包
+        /// 得到UDP转发数据头
         /// </summary>
-        /// <param name="CMD">命令码</param>
-        /// <param name="ATYP">类型</param>
-        /// <param name="ADDR">目的地址</param>
-        /// <param name="PORT">端口</param>
+        /// <param name="IP_Endpoint">IPEndPoint</param>
         /// <returns></returns>
-        public byte[] Proxy_Data(byte CMD, byte ATYP, string ADDR, Int16 PORT)
-        {
-            List<byte> List_Byte = new List<byte>();
-            List_Byte.Add(0X05);
-            List_Byte.Add(CMD);
-            List_Byte.Add(0X00);
-            List_Byte.Add(ATYP);
-            byte[] ADDR_Arr = Encoding.UTF8.GetBytes(ADDR);
-            List_Byte.Add((byte)ADDR_Arr.Length);
-            foreach (byte b in ADDR_Arr)
+        static public byte[] Get_UDP_Header(IPEndPoint IP_Endpoint) {
+            int IP_Len = IP_Endpoint.Address.GetAddressBytes().Length;
+            List<byte> Bytes_IPEndPoint = new List<byte>();
+            if (IP_Len == 4)
             {
-                List_Byte.Add(b);
+                //IPV4
+                Bytes_IPEndPoint.AddRange(new byte[] { 5, 0, 0, 1 });
+                
             }
-            //端口转byte
-            if (PORT > byte.MaxValue)
-            {
-                byte[] PORT_ARR = BitConverter.GetBytes(IPAddress.HostToNetworkOrder(PORT));
-                List_Byte.AddRange(PORT_ARR);
+            else if(IP_Len == 16){ 
+                //IPV6
+                Bytes_IPEndPoint.AddRange(new byte[] { 5, 0, 0, 4 });
             }
-            else
-            {
-                List_Byte.Add(0);
-                List_Byte.Add(Convert.ToByte(PORT));
-            }
-            return new byte[] { 05, 01, 00, 01, 0XCA, 0X6C, 0X16, 0X05, 0X00, 0X50 };
-            //return List_Byte.ToArray();
+
+            Bytes_IPEndPoint.AddRange(IP_Endpoint.Address.GetAddressBytes());
+            //Port为int32储存,实际应用中为Uint16,需要去掉前两个字节
+            Bytes_IPEndPoint.AddRange(BitConverter.GetBytes(IPAddress.HostToNetworkOrder(IP_Endpoint.Port)).Skip(2));
+            
+            return Bytes_IPEndPoint.ToArray();
         }
 
-        public TcpClient Connecte_Tcp(int type, string IP, int Port)
+        /// <summary>
+        /// 得到UDP转发的目标地址
+        /// </summary>
+        /// <param name="Data">待转发数据</param>
+        /// <returns></returns>
+        static public IPEndPoint Get_UDP_ADDR(byte[] Data)
+        {
+            IPAddress Host_IP = null;
+            byte[] Bytes_Port = new byte[2];
+            int Port = 0;
+            switch (Data[3]){
+                case 1:
+                    Host_IP = new IPAddress(Data.Skip(4).Take(4).ToArray());
+                    Bytes_Port = (Data.Skip(8).Take(2).ToArray());
+                    break;
+                case 3:
+                    Host_IP = Dns.GetHostEntry(Encoding.UTF8.GetString(Data.Skip(5).Take(Data[4]).ToArray())).AddressList[0];
+                    Bytes_Port = (Data.Skip(5 + Data[4]).Take(2).ToArray());
+                    break;
+                case 4:
+                    Host_IP = new IPAddress(Data.Skip(4).Take(16).ToArray());
+                    Bytes_Port = (Data.Skip(8).Take(2).ToArray());
+                    break;
+            }
+            Port = (Bytes_Port[0] << 8) + Bytes_Port[1];
+            IPEndPoint ADDR = new IPEndPoint(Host_IP, Port);
+            return ADDR;
+        }
+
+        /// <summary>
+        /// 建立TCP连接
+        /// </summary>
+        /// <param name="IP">IP</param>
+        /// <param name="Port">PORT</param>
+        /// <returns></returns>
+        static public TcpClient Connecte_TCP(IPAddress IP, int Port)
         {
             TcpClient tcpClient = new TcpClient();
-            if (type == 1)
+            try
             {
-                
-                try
-                {
-                    tcpClient.Connect(IP, Port);
-                    
-                }
-                catch
-                {
-
-                }
+                tcpClient.Connect(IP, Port);              
             }
-            /* else (type == 3){
+            catch
+            {
 
-             }else { 
-
-             }*/
-
+            }
             return tcpClient;
         }
 
@@ -226,7 +244,7 @@ namespace Socks5Server
         /// <param name="array_First">数据1</param>
         /// <param name="array_Second">数据2</param>
         /// <returns></returns>
-        public bool Data_Pare(byte[] array_First, byte[] array_Second)
+        static public bool Data_Pare(byte[] array_First, byte[] array_Second)
         {
             if (array_First.Length == array_Second.Length)
             {
