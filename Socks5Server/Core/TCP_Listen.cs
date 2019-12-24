@@ -15,7 +15,7 @@ namespace Socks5Server.Core
     {
         private int Data_Size = 1024;
         private byte[] Receive_Data;
-        int TimeOut = 60 * 1000 * 5;
+        int TimeOut =1000 * 5;
         bool UDP_Support = true;
 
 
@@ -67,7 +67,6 @@ namespace Socks5Server.Core
                 int size = State_Vt.TCP_Stream.EndRead(ar);
                 if (size > 0)
                 {
-                    Program.PrintLog(string.Format("收到客户端的{0}个字节数据", size));
                     byte[] Methods = Datahandle.Get_Checking_Method(Receive_Data.Take(size).ToArray());
                     int Data_Type = Datahandle.Get_Which_Type(Receive_Data.Take(size).ToArray());
                     //请求建立连接
@@ -102,14 +101,36 @@ namespace Socks5Server.Core
                             //UDP               
                             if (UDP_Support)
                             {
-                                
+
                                 //得到客户端开放UDP端口
                                 IPEndPoint ClientPoint = new IPEndPoint((State_Vt.Tcp_Client.Client.RemoteEndPoint as IPEndPoint).Address, Request_Info.port);
-                                var UDP_Client = new Socks_Server(ClientPoint).UDP_Client;
+                                var Socks_Servers = new Socks_Server(ClientPoint, State_Vt.Tcp_Client);
+                                var UDP_Client = Socks_Servers.UDP_Client;
                                 if (UDP_Client != null)
                                 {
                                     byte[] header = Datahandle.Get_UDP_Header(UDP_Client.Client.LocalEndPoint as IPEndPoint);
                                     TCP_Send(State_Vt.Tcp_Client, header);
+                                    try
+                                    {
+                                        State_Vt.TCP_Stream.BeginRead(Receive_Data, 0, Data_Size, new AsyncCallback((IAsyncResult ar) =>
+                                        {
+                                            try
+                                            {
+                                                if (Receive_Data.Length == 0)
+                                                {
+                                                    Close(State_Vt.Tcp_Client, Socks_Servers);
+                                                }
+                                            }
+                                            catch (Exception)
+                                            {
+
+                                            }
+                                        }), State_Vt);
+                                    }
+                                    catch (Exception)
+                                    {
+                                        Close(State_Vt.Tcp_Client, Socks_Servers);
+                                    }
                                 }
                                 else {
                                     Close(State_Vt.Tcp_Client);
@@ -122,8 +143,9 @@ namespace Socks5Server.Core
                             }
                         }
                     }
-                       
-                }else
+                    
+                }
+                else
                 {
                     Close(State_Vt.Tcp_Client);
                 }
@@ -141,7 +163,7 @@ namespace Socks5Server.Core
         /// 关闭客户端连接
         /// </summary>
         /// <param name="Tcp_Client">客户端TCPClient</param>
-        private void Close(TcpClient Tcp_Client)
+        private void Close(TcpClient Tcp_Client,Socks_Server socks_Servers = null)
         {
             try
             {
@@ -150,6 +172,11 @@ namespace Socks5Server.Core
                     Program.PrintLog(string.Format("已关闭客户端{0}的连接", Tcp_Client.Client.RemoteEndPoint));
                     Tcp_Client.GetStream().Close();
                     Tcp_Client.Close();
+                }
+
+                if (socks_Servers != null) {
+                    socks_Servers.UDP_Client.Close();
+                    socks_Servers = null;
                 }
             }
             catch (SocketException){ 

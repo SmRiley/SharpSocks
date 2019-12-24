@@ -166,19 +166,27 @@ namespace Socks5Server
         /// 得到UDP转发数据头
         /// </summary>
         /// <param name="IP_Endpoint">IPEndPoint</param>
+        /// <param name="Is_Rsv">Ver(5)还是RSV(0)</param>
         /// <returns></returns>
-        static public byte[] Get_UDP_Header(IPEndPoint IP_Endpoint) {
+        static public byte[] Get_UDP_Header(IPEndPoint IP_Endpoint, bool Is_Rsv = false) {
             int IP_Len = IP_Endpoint.Address.GetAddressBytes().Length;
             List<byte> Bytes_IPEndPoint = new List<byte>();
+            if (Is_Rsv)
+            {
+                Bytes_IPEndPoint.AddRange(new byte[] { 0, 0 });
+            }
+            else
+            {
+                Bytes_IPEndPoint.AddRange(new byte[] { 5, 0 });
+            }
             if (IP_Len == 4)
             {
                 //IPV4
-                Bytes_IPEndPoint.AddRange(new byte[] { 5, 0, 0, 1 });
-                
+                Bytes_IPEndPoint.AddRange(new byte[] { 0, 1 });
             }
-            else if(IP_Len == 16){ 
+            else if (IP_Len == 16) {
                 //IPV6
-                Bytes_IPEndPoint.AddRange(new byte[] { 5, 0, 0, 4 });
+                Bytes_IPEndPoint.AddRange(new byte[] { 0, 4 });
             }
 
             Bytes_IPEndPoint.AddRange(IP_Endpoint.Address.GetAddressBytes());
@@ -263,6 +271,20 @@ namespace Socks5Server
             }
 
 
+        }
+
+        static public bool TCP_Is_Connected(TcpClient Tcp_Client) {
+            try
+            {
+                Tcp_Client.GetStream().Write(new byte[] { 0 });
+            }
+            catch (Exception){
+                Tcp_Client.GetStream().Close();
+                Tcp_Client.Close();
+                return false;
+            }
+
+            return true;
         }
 
 
