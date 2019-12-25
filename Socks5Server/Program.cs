@@ -1,5 +1,4 @@
-﻿using System;
-using Socks5Server.Core;
+﻿using Socks5Server.Core;
 using System.Net;
 using System.Threading.Tasks;
 namespace Socks5Server
@@ -12,9 +11,6 @@ namespace Socks5Server
             Task.Delay(-1).Wait();
         }
 
-        public static void PrintLog(string str)
-        {
-            Console.WriteLine(DateTime.Now + string.Format("{0}{1}", ":", str));
-        }
+   
     }
 }

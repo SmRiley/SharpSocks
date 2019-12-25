@@ -2,15 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Net;
-using System.Net.NetworkInformation;
 using System.Net.Sockets;
 
 namespace Socks5Server
 {
-    class Datahandle
+    class DataHandle
     {
 
         /// <summary>
@@ -34,7 +31,16 @@ namespace Socks5Server
         static public byte[] Proxy_Error = new byte[] { 5, 1, 0, 1, 0, 0, 0, 0, 0, 0 };
 
         /// <summary>
-        /// 
+        /// 打印
+        /// </summary>
+        /// <param name="str">需打印字符串</param>
+        public static void WriteLog(string str)
+        {
+            Console.WriteLine(DateTime.Now + string.Format("{0}{1}", ":", str));
+        }
+
+        /// <summary>
+        /// 得到数据类型
         /// </summary>
         /// <param name="Data"></param>
         /// <returns>
@@ -47,7 +53,7 @@ namespace Socks5Server
         /// 7.转发请求UDP(IPV6)
         /// 0.其它
         /// </returns>
-        static public int Get_Which_Type(byte[] Data)
+        public static int Get_Which_Type(byte[] Data)
         {
             int Type = 0;
             if (Data.Length > 2 && Data.Length == Data[1] + 2)
@@ -98,7 +104,7 @@ namespace Socks5Server
         /// </summary>
         /// <param name="Data"></param>
         /// <returns></returns>
-        static public byte[] Get_Checking_Method(byte[] Data)
+        public static byte[] Get_Checking_Method(byte[] Data)
         {
             if (Get_Which_Type(Data) == 1)
             {
@@ -122,7 +128,7 @@ namespace Socks5Server
         /// string IP
         /// int PORT
         /// </returns>
-        static public(int type, IPAddress IP, int port) Get_Request_Info(byte[] Data)
+        public static (int type, IPAddress IP, int port) Get_Request_Info(byte[] Data)
         {
             IPAddress Host_IP = null;
             int Port = 0;
@@ -138,20 +144,23 @@ namespace Socks5Server
                         //IPV4
                         Host_IP = new IPAddress(Data.Skip(4).Take(4).ToArray());
                         Bytes_Port = (Data.Skip(8).Take(2).ToArray());
+                        WriteLog(string.Format("接收对IPV4:{0}:{1}的代理请求", Host_IP, Port));
                     }
                     else if (new List<int> { 3, 6 }.Contains(Which_Type))
                     {
                         //域名解析IP
                         Host_IP = Dns.GetHostEntry(Encoding.UTF8.GetString(Data.Skip(5).Take(Data[4]).ToArray())).AddressList[0];
                         Bytes_Port = (Data.Skip(5 + Data[4]).Take(2).ToArray());
+                        WriteLog(string.Format("接收对{0}({1}:{2})的代理请求",Encoding.UTF8.GetString(Data.Skip(5).Take(Data[4]).ToArray()), Host_IP, Port));
                     }
                     else if (new List<int> { 4, 7 }.Contains(Which_Type)) {
                         //IPV6
                         Host_IP = new IPAddress(Data.Skip(4).Take(16).ToArray());
                         Bytes_Port = (Data.Skip(8).Take(2).ToArray());
+                        WriteLog(string.Format("接收对IPV6:{0}:{1}的代理请求", Host_IP, Port));
                     }
                     Port = (Bytes_Port[0] << 8) + Bytes_Port[1];
-                    Program.PrintLog(string.Format("解析IP:{0},Port:{1}", Host_IP, Port));
+                    
                     return (Data[1], Host_IP, Port);
                 }
             }
@@ -168,7 +177,7 @@ namespace Socks5Server
         /// <param name="IP_Endpoint">IPEndPoint</param>
         /// <param name="Is_Rsv">Ver(5)还是RSV(0)</param>
         /// <returns></returns>
-        static public byte[] Get_UDP_Header(IPEndPoint IP_Endpoint, bool Is_Rsv = false) {
+        public static byte[] Get_UDP_Header(IPEndPoint IP_Endpoint, bool Is_Rsv = false) {
             int IP_Len = IP_Endpoint.Address.GetAddressBytes().Length;
             List<byte> Bytes_IPEndPoint = new List<byte>();
             if (Is_Rsv)
@@ -201,7 +210,7 @@ namespace Socks5Server
         /// </summary>
         /// <param name="Data">待转发数据</param>
         /// <returns></returns>
-        static public IPEndPoint Get_UDP_ADDR(byte[] Data)
+        public static IPEndPoint Get_UDP_ADDR(byte[] Data)
         {
             IPAddress Host_IP = null;
             byte[] Bytes_Port = new byte[2];
@@ -231,7 +240,7 @@ namespace Socks5Server
         /// <param name="IP">IP</param>
         /// <param name="Port">PORT</param>
         /// <returns></returns>
-        static public TcpClient Connecte_TCP(IPAddress IP, int Port)
+        public static TcpClient Connecte_TCP(IPAddress IP, int Port)
         {
             TcpClient tcpClient = new TcpClient();
             try
@@ -252,7 +261,7 @@ namespace Socks5Server
         /// <param name="array_First">数据1</param>
         /// <param name="array_Second">数据2</param>
         /// <returns></returns>
-        static public bool Data_Pare(byte[] array_First, byte[] array_Second)
+        public static bool Data_Pare(byte[] array_First, byte[] array_Second)
         {
             if (array_First.Length == array_Second.Length)
             {
@@ -273,20 +282,16 @@ namespace Socks5Server
 
         }
 
-        static public bool TCP_Is_Connected(TcpClient Tcp_Client) {
+        public static bool TCP_Usability(TcpClient Tcp_Client) {
             try
             {
                 Tcp_Client.GetStream().Write(new byte[] { 0 });
             }
-            catch (Exception){
-                Tcp_Client.GetStream().Close();
-                Tcp_Client.Close();
+            catch (Exception){               
                 return false;
             }
-
             return true;
         }
-
 
     }
 }
