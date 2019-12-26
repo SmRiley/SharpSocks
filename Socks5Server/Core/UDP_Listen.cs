@@ -13,7 +13,8 @@ namespace Socks5Server.Core
         List<(IPAddress IP_Addr, TcpClient TCP_Client)>  Init_Addr_List = new List<(IPAddress IP_Addr, TcpClient TCP_Client)>();
         List<(IPEndPoint IP_EndPoint, UDP_Server Udp_Server)> UDP_Proxy_List = new List<(IPEndPoint IP_EndPoint, UDP_Server Udp_Server)>();
         UdpClient UDP_Listener;
-        static int Surplus_Count = 3;
+        //UDP并发限制
+        static int Surplus_Count = 1000;
         public static int Surplus_Proxy_Count { get { return Surplus_Count; } private set { Surplus_Count = value; } }
         public UDP_Listen(int Port){
             UDP_Listener = new UdpClient(Port);
@@ -23,6 +24,12 @@ namespace Socks5Server.Core
             
         }
 
+
+        /// <summary>
+        /// 增加一条UDP代理隧道
+        /// </summary>
+        /// <param name="IP_EndPoint">客户端远程地址</param>
+        /// <param name="TCP_Client">TCP依赖</param>
         public void Add_Server(IPEndPoint IP_EndPoint,TcpClient TCP_Client) {
             if (IP_EndPoint.Port == 0)
             {
@@ -37,6 +44,10 @@ namespace Socks5Server.Core
              
         }
 
+        /// <summary>
+        /// 定时器:检查可用性
+        /// </summary>
+        /// <param name="state"></param>
         private void Usability_Check(Object state) {
             //不能直接在foreach中进行移除操作,不然会抛出异常
             var Remove_Range = new List<(IPEndPoint, UDP_Server)>();
@@ -50,11 +61,19 @@ namespace Socks5Server.Core
             Remove_Range.ForEach(( i)=> UDP_Proxy_List.Remove(i));
         }
 
+        /// <summary>
+        /// 回源
+        /// </summary>
+        /// <param name="Client_Point">客户端远程地址</param>
+        /// <param name="Send_Data">待发送数据</param>
         private void Return_Source(IPEndPoint Client_Point, byte[] Send_Data) {
             UDP_Listener.Send(Send_Data, Send_Data.Length, Client_Point);
         }
 
-
+        /// <summary>
+        /// UDP接收回调
+        /// </summary>
+        /// <param name="ar">回调对象</param>
         public void UDP_Receive(IAsyncResult ar) {
             IPEndPoint Remote_Point = null;
             byte[] Receive_Data = UDP_Listener.EndReceive(ar,ref Remote_Point);
@@ -80,6 +99,11 @@ namespace Socks5Server.Core
             
         }
 
+        /// <summary>
+        /// 分辨远程端口来源
+        /// </summary>
+        /// <param name="Remote_Point"></param>
+        /// <returns></returns>
         private UDP_Server Which_Client(IPEndPoint Remote_Point) {
             //直接转发
             for (int i = 0; i < UDP_Proxy_List.Count; i++)

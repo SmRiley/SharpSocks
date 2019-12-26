@@ -282,6 +282,11 @@ namespace Socks5Server
 
         }
 
+        /// <summary>
+        /// TCP可用性检查
+        /// </summary>
+        /// <param name="Tcp_Client">待检测对象</param>
+        /// <returns></returns>
         public static bool TCP_Usability(TcpClient Tcp_Client) {
             try
             {

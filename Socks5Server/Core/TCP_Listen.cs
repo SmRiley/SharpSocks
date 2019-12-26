@@ -98,7 +98,8 @@ namespace Socks5Server.Core
                             }
                         }
                         else if (Request_Info.type == 3) {
-                            //UDP             
+                            //UDP 
+                            //判断是否开启UDP支持及UDP阈值
                             if (UDP_Support && UDP_Listen.Surplus_Proxy_Count > 0)
                             {
                                 //得到客户端开放UDP端口

@@ -20,6 +20,8 @@ namespace Socks5Server.Core
             TCP_Client = Tcp_Client;
             try{
                 UDP_Client = new UdpClient(0);
+                UDP_Client.Client.ReceiveTimeout = 1000 * 5;
+                UDP_Client.Client.SendTimeout = 1000 * 5;
                 Return_Source = new Return_Source_Dg(RS);
                 UDP_Client.BeginReceive(new AsyncCallback(UDP_Recieve), null);
             }catch(SocketException) {
@@ -27,6 +29,10 @@ namespace Socks5Server.Core
             }
         }
 
+        /// <summary>
+        /// UDP接收回调
+        /// </summary>
+        /// <param name="ar"></param>
         private void UDP_Recieve(IAsyncResult ar) {
             try
             {
@@ -49,11 +55,15 @@ namespace Socks5Server.Core
             }
         }
 
+
         public void UDP_Send(byte[] Send_Data,IPEndPoint IP_EndPoint) {
             UDP_Client.Send(Send_Data, Send_Data.Length, IP_EndPoint);
             Proxy_Point_List.Add(IP_EndPoint);
         }
 
+        /// <summary>
+        /// 关闭UDP对象及TCP依赖
+        /// </summary>
         public void Close() {
             try
             {
