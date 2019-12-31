@@ -9,3 +9,4 @@ C:\Users\SmRiley\source\repos\Socks5Server\Socks5Server\bin\Debug\netcoreapp3.0\
 C:\Users\SmRiley\source\repos\Socks5Server\Socks5Server\bin\Debug\netcoreapp3.0\Socks5Server.pdb
 C:\Users\SmRiley\source\repos\Socks5Server\Socks5Server\obj\Debug\netcoreapp3.0\Socks5Server.dll
 C:\Users\SmRiley\source\repos\Socks5Server\Socks5Server\obj\Debug\netcoreapp3.0\Socks5Server.pdb
+C:\Users\SmRiley\source\repos\Socks5Server\Socks5Server\bin\Debug\netcoreapp3.0\Config.json

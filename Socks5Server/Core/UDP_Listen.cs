@@ -14,7 +14,7 @@ namespace Socks5Server.Core
         List<(IPEndPoint IP_EndPoint, UDP_Server Udp_Server)> UDP_Proxy_List = new List<(IPEndPoint IP_EndPoint, UDP_Server Udp_Server)>();
         UdpClient UDP_Listener;
         //UDP并发限制
-        static int Surplus_Count = 1000;
+        static int Surplus_Count = 300;
         public static int Surplus_Proxy_Count { get { return Surplus_Count; } private set { Surplus_Count = value; } }
         public UDP_Listen(int Port){
             UDP_Listener = new UdpClient(Port);
@@ -40,7 +40,7 @@ namespace Socks5Server.Core
                 UDP_Proxy_List.Add((Udp_Server.Client_Point, Udp_Server));
             }
             Surplus_Proxy_Count--;
-            DataHandle.WriteLog(string.Format("已开启对{0}的UDP代理隧道", IP_EndPoint));
+            DataHandle.WriteLog($"已开启对{IP_EndPoint}的UDP代理隧道");
              
         }
 
@@ -50,15 +50,16 @@ namespace Socks5Server.Core
         /// <param name="state"></param>
         private void Usability_Check(Object state) {
             //不能直接在foreach中进行移除操作,不然会抛出异常
-            var Remove_Range = new List<(IPEndPoint, UDP_Server)>();
-            UDP_Proxy_List.ForEach(i => {
-                if (!DataHandle.TCP_Usability(i.Udp_Server.TCP_Client)) {
+            //解决线程安全
+            foreach (var i in UDP_Proxy_List.ToArray())
+            {
+                if (!DataHandle.TCP_Usability(i.Udp_Server.TCP_Client))
+                {
                     i.Udp_Server.Close();
-                    Remove_Range.Add(i);
+                    UDP_Proxy_List.Remove(i);
                     Surplus_Proxy_Count++;
                 }
-            });
-            Remove_Range.ForEach(( i)=> UDP_Proxy_List.Remove(i));
+            }
         }
 
         /// <summary>

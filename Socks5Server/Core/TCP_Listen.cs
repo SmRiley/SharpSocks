@@ -16,16 +16,24 @@ namespace Socks5Server.Core
         bool UDP_Support = true;
         public TCP_Listen(IPAddress IP,int Port, bool Udp_Support = true) {
             Receive_Data = new byte[Data_Size];
-            TcpListener Socks_Server = new TcpListener(IP, Port);
-            DataHandle.WriteLog(string.Format("Socks服务已启动,监听{0}端口中", Port));
-            Socks_Server.Start();
-            Socks_Server.BeginAcceptTcpClient(AcceptTcpClient,Socks_Server);
-            if (Udp_Support)
+            try
             {
-                UDP_Listener = new UDP_Listen(Port);
+                TcpListener Socks_Server = new TcpListener(IP, Port);
+
+                Socks_Server.Start();
+                Socks_Server.BeginAcceptTcpClient(AcceptTcpClient, Socks_Server);
+                if (Udp_Support)
+                {
+                    UDP_Listener = new UDP_Listen(Port);
+                }
+                else
+                {
+                    UDP_Support = Udp_Support;
+                }
+                DataHandle.WriteLog($"Socks服务已启动,监听{Port}端口中,UDP支持:{UDP_Support}");
             }
-            else {
-                UDP_Support = Udp_Support;
+            catch (SocketException){
+                DataHandle.WriteLog($"端口{Port}被占用,监听服务开启失败");
             }
         }
 
@@ -52,7 +60,7 @@ namespace Socks5Server.Core
 
         private void TCP_Connect(object state) {
             TcpClient Tcp_Client = state as TcpClient;
-            DataHandle.WriteLog(string.Format("接收来自{0},当前线程数:{1}",Tcp_Client.Client.RemoteEndPoint,ThreadPool.ThreadCount));
+            DataHandle.WriteLog($"接收来自{Tcp_Client.Client.RemoteEndPoint},当前线程数:{ThreadPool.ThreadCount}");
             NetworkStream TCP_Stream = Tcp_Client.GetStream();
             var State_VT = (Tcp_Client, TCP_Stream);
             TCP_Stream.BeginRead(Receive_Data,0,Data_Size,new AsyncCallback(TCP_Receive),State_VT);
@@ -139,7 +147,7 @@ namespace Socks5Server.Core
             {
                 if (Tcp_Client.Connected)
                 {
-                    DataHandle.WriteLog(string.Format("已关闭客户端{0}的连接", Tcp_Client.Client.RemoteEndPoint));
+                    DataHandle.WriteLog($"已关闭客户端{Tcp_Client.Client.RemoteEndPoint}的连接");
                     Tcp_Client.GetStream().Close();
                     Tcp_Client.Close();
                 }

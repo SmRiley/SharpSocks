@@ -26,7 +26,7 @@ namespace Socks5Server.Core
                 P_Read_Delegate = new AsyncCallback(TCP_Proxy_Receive);
                 Client_Stream.BeginRead(Client_Data, 0, Data_Size, C_Read_Delegate, null);
                 Proxy_Stream.BeginRead(Proxy_Data, 0, Data_Size, P_Read_Delegate, null);
-                DataHandle.WriteLog(string.Format("开启对{0}的TCP代理隧道", TCP_Client.Client.RemoteEndPoint));
+                DataHandle.WriteLog($"开启对{TCP_Client.Client.RemoteEndPoint}的TCP代理隧道");
             }
             catch (SocketException)
             {
@@ -116,14 +116,14 @@ namespace Socks5Server.Core
                 if (TCP_Client != null)
                 {
 
-                    DataHandle.WriteLog(string.Format("已断开客户端{0}的连接", TCP_Client.Client.RemoteEndPoint));
+                    DataHandle.WriteLog($"已断开客户端{TCP_Client.Client.RemoteEndPoint}的连接");
                     Client_Stream.Close();
                     TCP_Client.Close();
                     TCP_Client = null;
                 }
                 if (TCP_Proxy != null)
                 {
-                    DataHandle.WriteLog(string.Format("已断开代理端{0}的连接", TCP_Proxy.Client.RemoteEndPoint));
+                    DataHandle.WriteLog($"已断开代理端{TCP_Proxy.Client.RemoteEndPoint}的连接");
                     Proxy_Stream.Close();
                     TCP_Proxy.Close();
                     TCP_Proxy = null;

@@ -67,7 +67,7 @@ namespace Socks5Server.Core
         public void Close() {
             try
             {
-                DataHandle.WriteLog(string.Format("已关闭{0}的UDP代理隧道",Client_Point));
+                DataHandle.WriteLog($"已关闭{Client_Point}的UDP代理隧道");
                 UDP_Client.Close();
                 TCP_Client.GetStream().Close();
                 TCP_Client.Close();

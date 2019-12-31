@@ -36,7 +36,7 @@ namespace Socks5Server
         /// <param name="str">需打印字符串</param>
         public static void WriteLog(string str)
         {
-            Console.WriteLine(DateTime.Now + string.Format("{0}{1}", ":", str));
+            Console.WriteLine(DateTime.Now + $":{str}");
         }
 
         /// <summary>
@@ -144,20 +144,21 @@ namespace Socks5Server
                         //IPV4
                         Host_IP = new IPAddress(Data.Skip(4).Take(4).ToArray());
                         Bytes_Port = (Data.Skip(8).Take(2).ToArray());
-                        WriteLog(string.Format("接收对IPV4:{0}:{1}的代理请求", Host_IP, Port));
+                        WriteLog($"接收对IPV4:{Host_IP}:{Port}的代理请求");
                     }
                     else if (new List<int> { 3, 6 }.Contains(Which_Type))
                     {
                         //域名解析IP
-                        Host_IP = Dns.GetHostEntry(Encoding.UTF8.GetString(Data.Skip(5).Take(Data[4]).ToArray())).AddressList[0];
+                        string Realm_Name = Encoding.UTF8.GetString(Data.Skip(5).Take(Data[4]).ToArray());
+                        Host_IP = Dns.GetHostEntry(Realm_Name).AddressList[0];
                         Bytes_Port = (Data.Skip(5 + Data[4]).Take(2).ToArray());
-                        WriteLog(string.Format("接收对{0}({1}:{2})的代理请求",Encoding.UTF8.GetString(Data.Skip(5).Take(Data[4]).ToArray()), Host_IP, Port));
+                        WriteLog($"接收对{Realm_Name}({Host_IP}:{Port})的代理请求");
                     }
                     else if (new List<int> { 4, 7 }.Contains(Which_Type)) {
                         //IPV6
                         Host_IP = new IPAddress(Data.Skip(4).Take(16).ToArray());
                         Bytes_Port = (Data.Skip(8).Take(2).ToArray());
-                        WriteLog(string.Format("接收对IPV6:{0}:{1}的代理请求", Host_IP, Port));
+                        WriteLog($"接收对IPV6:{Host_IP}:{Port}的代理请求");
                     }
                     Port = (Bytes_Port[0] << 8) + Bytes_Port[1];
                     
