@@ -16,12 +16,12 @@ namespace Socks5Server.Core
         //UDP并发限制
         static int Surplus_Count = 300;
         public static int Surplus_Proxy_Count { get { return Surplus_Count; } private set { Surplus_Count = value; } }
+        Timer timer;
         public UDP_Listen(int Port){
             UDP_Listener = new UdpClient(Port);
             UDP_Listener.BeginReceive(UDP_Receive,null);
-            //检查并剔除已经失效的TCPClient
-            Timer Usability_Checker = new Timer(new TimerCallback(Usability_Check),null,0,1000 * 5);
-            
+            //检查并剔除已经失效的TCPClient           
+            timer = new Timer(new TimerCallback(Usability_Check), null, 5000, 5000);
         }
 
 
@@ -48,17 +48,23 @@ namespace Socks5Server.Core
         /// 定时器:检查可用性
         /// </summary>
         /// <param name="state"></param>
-        private void Usability_Check(Object state) {
+        private void Usability_Check(object state) {
             //不能直接在foreach中进行移除操作,不然会抛出异常
             //解决线程安全
-            foreach (var i in UDP_Proxy_List.ToArray())
+            try
             {
-                if (!DataHandle.TCP_Usability(i.Udp_Server.TCP_Client))
+                foreach (var i in UDP_Proxy_List.ToArray())
                 {
-                    i.Udp_Server.Close();
-                    UDP_Proxy_List.Remove(i);
-                    Surplus_Proxy_Count++;
+                    if (!DataHandle.TCP_Usability(i.Udp_Server.TCP_Client))
+                    {
+                        i.Udp_Server.Close();
+                        UDP_Proxy_List.Remove(i);
+                        Surplus_Proxy_Count++;
+                    }
                 }
+            }
+            catch (Exception) { 
+            
             }
         }
 
