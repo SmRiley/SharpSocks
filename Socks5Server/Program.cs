@@ -22,7 +22,7 @@ namespace Socks5Server
                     if (JsonReader.TokenType == JsonTokenType.EndObject)
                     {
                         var ObjectInfo = JsonObject.ToArray();
-                        new TCP_Listen(IPAddress.Any, Convert.ToInt16(ObjectInfo[0]), Convert.ToBoolean(ObjectInfo[2]));
+                        new TCP_Listen(IPAddress.Any, Convert.ToInt16(ObjectInfo[0]),ObjectInfo[1], Convert.ToBoolean(ObjectInfo[2]));
                         JsonObject = new List<string>();
                     }
                     else if (JsonReader.TokenType == JsonTokenType.String)

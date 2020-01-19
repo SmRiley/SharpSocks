@@ -14,7 +14,6 @@ namespace Socks5Server.Core
         List<IPEndPoint> Proxy_Point_List = new List<IPEndPoint>();
         public delegate void Return_Source_Dg(IPEndPoint Client_Point, byte[] Send_Data);
         Return_Source_Dg Return_Source;
-
         public UDP_Server(IPEndPoint IP_Point, TcpClient Tcp_Client, Return_Source_Dg RS) {
             Client_Point = IP_Point;
             TCP_Client = Tcp_Client;
@@ -22,7 +21,7 @@ namespace Socks5Server.Core
                 UDP_Client = new UdpClient(0);
                 UDP_Client.Client.ReceiveTimeout = 1000 * 5;
                 UDP_Client.Client.SendTimeout = 1000 * 5;
-                Return_Source = new Return_Source_Dg(RS);
+                Return_Source = RS;
                 UDP_Client.BeginReceive(new AsyncCallback(UDP_Recieve), null);
             }catch(SocketException) {
                 UDP_Client = null;
@@ -43,8 +42,8 @@ namespace Socks5Server.Core
                     if (Proxy_Point_List.Contains(Remote_Point))
                     {
                         var Header = DataHandle.Get_UDP_Header(Remote_Point);
-                        var Send_Data = Header.Concat(Receive_Data).ToArray();
-                        Return_Source(Client_Point, Send_Data);
+                        var Send_Data =Header.Concat(Receive_Data).ToArray();
+                        Return_Source(Client_Point,DataHandle.En_Bytes(Send_Data));
                     }
 
                 }

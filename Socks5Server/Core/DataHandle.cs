@@ -4,11 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Net;
 using System.Net.Sockets;
+using System.Security.Cryptography;
 
 namespace Socks5Server
 {
     class DataHandle
     {
+
+        static public List<byte> Key { set; private get; }
 
         /// <summary>
         /// 无需验证
@@ -144,6 +147,7 @@ namespace Socks5Server
                         //IPV4
                         Host_IP = new IPAddress(Data.Skip(4).Take(4).ToArray());
                         Bytes_Port = (Data.Skip(8).Take(2).ToArray());
+                        Port = (Bytes_Port[0] << 8) + Bytes_Port[1];
                         WriteLog($"接收对IPV4:{Host_IP}:{Port}的代理请求");
                     }
                     else if (new List<int> { 3, 6 }.Contains(Which_Type))
@@ -152,15 +156,17 @@ namespace Socks5Server
                         string Realm_Name = Encoding.UTF8.GetString(Data.Skip(5).Take(Data[4]).ToArray());
                         Host_IP = Dns.GetHostEntry(Realm_Name).AddressList[0];
                         Bytes_Port = (Data.Skip(5 + Data[4]).Take(2).ToArray());
+                        Port = (Bytes_Port[0] << 8) + Bytes_Port[1];
                         WriteLog($"接收对{Realm_Name}({Host_IP}:{Port})的代理请求");
                     }
                     else if (new List<int> { 4, 7 }.Contains(Which_Type)) {
                         //IPV6
                         Host_IP = new IPAddress(Data.Skip(4).Take(16).ToArray());
                         Bytes_Port = (Data.Skip(8).Take(2).ToArray());
+                        Port = (Bytes_Port[0] << 8) + Bytes_Port[1];
                         WriteLog($"接收对IPV6:{Host_IP}:{Port}的代理请求");
                     }
-                    Port = (Bytes_Port[0] << 8) + Bytes_Port[1];
+                    
                     
                     return (Data[1], Host_IP, Port);
                 }
@@ -202,7 +208,7 @@ namespace Socks5Server
             Bytes_IPEndPoint.AddRange(IP_Endpoint.Address.GetAddressBytes());
             //Port为int32储存,实际应用中为Uint16,需要去掉前两个字节
             Bytes_IPEndPoint.AddRange(BitConverter.GetBytes(IPAddress.HostToNetworkOrder(IP_Endpoint.Port)).Skip(2));
-            
+           
             return Bytes_IPEndPoint.ToArray();
         }
 
@@ -284,6 +290,65 @@ namespace Socks5Server
         }
 
         /// <summary>
+        /// 得到密匙
+        /// </summary>
+        /// <param name="Key"></param>
+        /// <returns></returns>
+        public static List<byte> Get_Pass(string Key)
+        {
+            int Bytes_Key = 0;
+            foreach (var i in Encoding.UTF8.GetBytes(Key))
+            {
+                Bytes_Key += i;
+            }
+            var random = new Random(Bytes_Key);
+            var Bytes_Pass = new List<byte>();
+            for (int i = 0; i < 256; i++)
+            {
+                byte Random_int = (byte)random.Next(256);
+                if (!Bytes_Pass.Contains(Random_int))
+                {
+                    Bytes_Pass.Add(Random_int);
+                }
+                else
+                {
+                    i--;
+                }
+            }
+            return Bytes_Pass;
+        }
+
+        /// <summary>
+        /// 加密
+        /// </summary>
+        /// <param name="Bytes"></param>
+        /// <returns></returns>
+        public static byte[] En_Bytes(byte[] Bytes)
+        {
+            var List_Byte = new List<byte>();
+            foreach (var b in Bytes)
+            {
+                List_Byte.Add((byte)Key.IndexOf(b));
+            }
+            return List_Byte.ToArray();
+        }
+
+        /// <summary>
+        /// 解密
+        /// </summary>
+        /// <param name="Bytes"></param>
+        /// <returns></returns>
+        public static byte[] De_Bytes(byte[] Bytes)
+        {
+            var List_Byte = new List<byte>();
+            foreach (var b in Bytes)
+            {
+                List_Byte.Add(Key[b]);
+            }
+            return List_Byte.ToArray();
+        }
+
+        /// <summary>
         /// TCP可用性检查
         /// </summary>
         /// <param name="Tcp_Client">待检测对象</param>
@@ -291,7 +356,7 @@ namespace Socks5Server
         public static bool TCP_Usability(TcpClient Tcp_Client) {
             try
             {
-                Tcp_Client.GetStream().Write(new byte[] { 0 });
+                Tcp_Client.GetStream().Write(new byte[] {0});
             }
             catch (Exception){               
                 return false;

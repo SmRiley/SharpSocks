@@ -83,7 +83,7 @@ namespace Socks5Server.Core
         /// <param name="ar">回调对象</param>
         public void UDP_Receive(IAsyncResult ar) {
             IPEndPoint Remote_Point = null;
-            byte[] Receive_Data = UDP_Listener.EndReceive(ar,ref Remote_Point);
+            byte[] Receive_Data =DataHandle.De_Bytes(UDP_Listener.EndReceive(ar,ref Remote_Point));
             int header_len = 0;
             var Rs = Which_Client(Remote_Point);
             if (Rs != null && Receive_Data[2] == 0) {

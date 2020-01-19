@@ -1,11 +1,11 @@
 {
   "version": 3,
   "targets": {
-    ".NETCoreApp,Version=v3.0": {}
+    ".NETCoreApp,Version=v3.1": {}
   },
   "libraries": {},
   "projectFileDependencyGroups": {
-    ".NETCoreApp,Version=v3.0": []
+    ".NETCoreApp,Version=v3.1": []
   },
   "packageFolders": {
     "C:\\Users\\SmRiley\\.nuget\\packages\\": {},
@@ -14,11 +14,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\SmRiley\\source\\repos\\Socks5Server\\Socks5Server\\Socks5Server.csproj",
+      "projectUniqueName": "C:\\Users\\SmRiley\\OneDrive\\source\\repos\\Socks5Server\\Socks5Server\\Socks5Server.csproj",
       "projectName": "Socks5Server",
-      "projectPath": "C:\\Users\\SmRiley\\source\\repos\\Socks5Server\\Socks5Server\\Socks5Server.csproj",
+      "projectPath": "C:\\Users\\SmRiley\\OneDrive\\source\\repos\\Socks5Server\\Socks5Server\\Socks5Server.csproj",
       "packagesPath": "C:\\Users\\SmRiley\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\SmRiley\\source\\repos\\Socks5Server\\Socks5Server\\obj\\",
+      "outputPath": "C:\\Users\\SmRiley\\OneDrive\\source\\repos\\Socks5Server\\Socks5Server\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
@@ -28,7 +28,7 @@
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
-        "netcoreapp3.0"
+        "netcoreapp3.1"
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
@@ -36,7 +36,7 @@
         "https://nuget.cdn.azure.cn/v3/index.json": {}
       },
       "frameworks": {
-        "netcoreapp3.0": {
+        "netcoreapp3.1": {
           "projectReferences": {}
         }
       },
@@ -47,7 +47,7 @@
       }
     },
     "frameworks": {
-      "netcoreapp3.0": {
+      "netcoreapp3.1": {
         "imports": [
           "net461",
           "net462",
@@ -63,7 +63,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.0.100\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.100\\RuntimeIdentifierGraph.json"
       }
     }
   }

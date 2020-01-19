@@ -14,7 +14,8 @@ namespace Socks5Server.Core
         int TimeOut =1000 * 5;
         UDP_Listen UDP_Listener;
         bool UDP_Support = true;
-        public TCP_Listen(IPAddress IP,int Port, bool Udp_Support = true) {
+        public TCP_Listen(IPAddress IP,int Port,string Pass ,bool Udp_Support = true) {
+            DataHandle.Key =  DataHandle.Get_Pass(Pass);
             Receive_Data = new byte[Data_Size];
             try
             {
@@ -55,7 +56,7 @@ namespace Socks5Server.Core
         /// <param name="tcpClient">TCPClient</param>
         /// <param name="Data">数据</param>
         private void TCP_Send(TcpClient tcpClient,byte[] Data) {
-            tcpClient.GetStream().Write(Data);
+            tcpClient.GetStream().Write(DataHandle.En_Bytes(Data));
         }
 
         private void TCP_Connect(object state) {
@@ -74,11 +75,11 @@ namespace Socks5Server.Core
             var State_Vt = (((TcpClient Tcp_Client, NetworkStream TCP_Stream))ar.AsyncState);
             try
             {
-                int size = State_Vt.TCP_Stream.EndRead(ar);
-                if (size > 0)
+                byte[] Data =DataHandle.De_Bytes(Receive_Data.Take(State_Vt.TCP_Stream.EndRead(ar)).ToArray());
+                if (Data.Length > 0)
                 {
-                    byte[] Methods = DataHandle.Get_Checking_Method(Receive_Data.Take(size).ToArray());
-                    int Data_Type = DataHandle.Get_Which_Type(Receive_Data.Take(size).ToArray());
+                    byte[] Methods = DataHandle.Get_Checking_Method(Data);
+                    int Data_Type = DataHandle.Get_Which_Type(Data);
                     //请求建立连接
 
                     if (Methods.Contains((byte)0))
@@ -89,7 +90,7 @@ namespace Socks5Server.Core
                     //接受代理目标端信息
                     else if (1 < Data_Type && Data_Type < 8)
                     {
-                        var Request_Info = DataHandle.Get_Request_Info(Receive_Data.Take(size).ToArray());
+                        var Request_Info = DataHandle.Get_Request_Info(Data);
                         if (Request_Info.type == 1)
                         {
                             //TCP
@@ -97,7 +98,7 @@ namespace Socks5Server.Core
                             if (Tcp_Proxy.Connected)
                             {
                                 new TCP_Server(State_Vt.Tcp_Client, Tcp_Proxy);
-                                TCP_Send(State_Vt.Tcp_Client, DataHandle.Proxy_Success);                             
+                                TCP_Send(State_Vt.Tcp_Client, DataHandle.Proxy_Success);
                             }
                             else
                             {
@@ -105,7 +106,8 @@ namespace Socks5Server.Core
                                 throw (new SocketException());
                             }
                         }
-                        else if (Request_Info.type == 3) {
+                        else if (Request_Info.type == 3)
+                        {
                             //UDP 
                             //判断是否开启UDP支持及UDP阈值
                             if (UDP_Support && UDP_Listen.Surplus_Proxy_Count > 0)
@@ -122,10 +124,13 @@ namespace Socks5Server.Core
                             }
                         }
                     }
+                    else {
+                        throw (new SocketException());
+                    }
                 }
                 else
                 {
-                    throw (new SocketException());
+                    throw (new SocketException());                 
                 }
             }
             catch (Exception)
