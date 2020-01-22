@@ -54,3 +54,7 @@ Local
 1. Local 和 Server 的 password 必须一致才能正常使用，password 不要泄露
 2. 安全组只需要放行相应TCP端口,但是如果需要UDP支持,请在服务器中放行全部UDP端口的通行.
 3. Local并不会像SS一样直接代理浏览器的HTTP(HTTPS)请求,建议Chrome搭配[SwitchyOmega](https://github.com/FelisCatus/SwitchyOmega "SwitchyOmega")使用.
+
+### 参考:
+1. https://github.com/gwuhaolin/lightsocks
+2. https://segmentfault.com/a/1190000011862912
