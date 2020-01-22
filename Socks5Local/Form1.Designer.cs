@@ -103,7 +103,7 @@
             this.Local_PORT.Name = "Local_PORT";
             this.Local_PORT.Size = new System.Drawing.Size(99, 21);
             this.Local_PORT.TabIndex = 6;
-            this.Local_PORT.Text = "3080";
+            this.Local_PORT.Text = "1080";
             // 
             // label3
             // 
