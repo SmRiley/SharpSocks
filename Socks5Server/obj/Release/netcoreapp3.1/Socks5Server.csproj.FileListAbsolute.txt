@@ -1,0 +1,12 @@
+C:\Users\SmRiley\OneDrive\source\repos\Socks5Server\Socks5Server\bin\Release\netcoreapp3.1\Socks5Server.exe
+C:\Users\SmRiley\OneDrive\source\repos\Socks5Server\Socks5Server\bin\Release\netcoreapp3.1\Config.json
+C:\Users\SmRiley\OneDrive\source\repos\Socks5Server\Socks5Server\bin\Release\netcoreapp3.1\Socks5Server.deps.json
+C:\Users\SmRiley\OneDrive\source\repos\Socks5Server\Socks5Server\bin\Release\netcoreapp3.1\Socks5Server.runtimeconfig.json
+C:\Users\SmRiley\OneDrive\source\repos\Socks5Server\Socks5Server\bin\Release\netcoreapp3.1\Socks5Server.runtimeconfig.dev.json
+C:\Users\SmRiley\OneDrive\source\repos\Socks5Server\Socks5Server\bin\Release\netcoreapp3.1\Socks5Server.dll
+C:\Users\SmRiley\OneDrive\source\repos\Socks5Server\Socks5Server\bin\Release\netcoreapp3.1\Socks5Server.pdb
+C:\Users\SmRiley\OneDrive\source\repos\Socks5Server\Socks5Server\obj\Release\netcoreapp3.1\Socks5Server.csprojAssemblyReference.cache
+C:\Users\SmRiley\OneDrive\source\repos\Socks5Server\Socks5Server\obj\Release\netcoreapp3.1\Socks5Server.AssemblyInfoInputs.cache
+C:\Users\SmRiley\OneDrive\source\repos\Socks5Server\Socks5Server\obj\Release\netcoreapp3.1\Socks5Server.AssemblyInfo.cs
+C:\Users\SmRiley\OneDrive\source\repos\Socks5Server\Socks5Server\obj\Release\netcoreapp3.1\Socks5Server.dll
+C:\Users\SmRiley\OneDrive\source\repos\Socks5Server\Socks5Server\obj\Release\netcoreapp3.1\Socks5Server.pdb

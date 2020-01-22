@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.button1 = new System.Windows.Forms.Button();
             this.IP_ADDR = new System.Windows.Forms.TextBox();
             this.PORT = new System.Windows.Forms.TextBox();
@@ -37,6 +38,7 @@
             this.Local_PORT = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.Pass = new System.Windows.Forms.TextBox();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // button1
@@ -114,17 +116,31 @@
             // 
             // Pass
             // 
+            this.Pass.Font = new System.Drawing.Font("微软雅黑", 7.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.Pass.Location = new System.Drawing.Point(108, 87);
             this.Pass.Name = "Pass";
-            this.Pass.Size = new System.Drawing.Size(179, 21);
+            this.Pass.Size = new System.Drawing.Size(107, 21);
             this.Pass.TabIndex = 8;
             this.Pass.Text = "123456";
+            this.Pass.UseSystemPasswordChar = true;
+            // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Location = new System.Drawing.Point(221, 89);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(72, 16);
+            this.checkBox1.TabIndex = 9;
+            this.checkBox1.Text = "显示密码";
+            this.checkBox1.UseVisualStyleBackColor = true;
+            this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(554, 119);
+            this.Controls.Add(this.checkBox1);
             this.Controls.Add(this.Pass);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.Local_PORT);
@@ -134,6 +150,7 @@
             this.Controls.Add(this.PORT);
             this.Controls.Add(this.IP_ADDR);
             this.Controls.Add(this.button1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Socks5Local";
@@ -153,6 +170,7 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox Pass;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.CheckBox checkBox1;
     }
 }
 
