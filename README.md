@@ -44,6 +44,7 @@ Server:安装.Net Core3.1运行环境,
 Server:
 - Windows:直接运行Socks5Server.exe
 - Linux: dotnet Socks5Server.dll
+
 Local
 填入Server端服务器信息(如图),点击启动
 ![Local.jpg](https://cdn.sauyoo.com/2020/01/22/1579691572.jpg)
