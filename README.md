@@ -50,7 +50,7 @@ Local
 ![Local.jpg](https://cdn.sauyoo.com/2020/01/22/1579691572.jpg)
 
 *开始科学的上网吧~*
-![TIM截图20200122192851.jpg](https://cdn.sauyoo.com/2020/01/22/1579692549.jpg)
+![TIM截图20200122192851.jpg](https://cdn.sauyoo.com/2020/01/22/1579692559.jpg)
 ### 注意
 1. Local 和 Server 的 password 必须一致才能正常使用，password 不要泄露
 2. 安全组只需要放行相应TCP端口,但是如果需要UDP支持,请在服务器中放行全部UDP端口的通行.
