@@ -47,9 +47,11 @@ Server:
 
 Local
 填入Server端服务器信息(如图),点击启动
+
 ![Local](https://cdn.seeull.com/2020/03/15/1584251595.png)
 
 *开始科学的上网吧~*
+
 ![Server](https://cdn.seeull.com/2020/03/15/1584251575.png)
 ### 注意
 1. Local 和 Server 的 password 必须一致才能正常使用，password 不要泄露
