@@ -8,21 +8,17 @@
     ".NETCoreApp,Version=v3.1": []
   },
   "packageFolders": {
-    "C:\\Users\\SmRiley\\.nuget\\packages\\": {},
-    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
+    "C:\\Users\\SmRiley\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\SmRiley\\OneDrive\\source\\repos\\Socks5Server\\Socks5Server\\Socks5Server.csproj",
+      "projectUniqueName": "C:\\Users\\SmRiley\\OneDrive\\source\\repos\\SharpSocks\\Socks5Server\\Socks5Server.csproj",
       "projectName": "Socks5Server",
-      "projectPath": "C:\\Users\\SmRiley\\OneDrive\\source\\repos\\Socks5Server\\Socks5Server\\Socks5Server.csproj",
+      "projectPath": "C:\\Users\\SmRiley\\OneDrive\\source\\repos\\SharpSocks\\Socks5Server\\Socks5Server.csproj",
       "packagesPath": "C:\\Users\\SmRiley\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\SmRiley\\OneDrive\\source\\repos\\Socks5Server\\Socks5Server\\obj\\",
+      "outputPath": "C:\\Users\\SmRiley\\OneDrive\\source\\repos\\SharpSocks\\Socks5Server\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-      ],
       "configFilePaths": [
         "C:\\Users\\SmRiley\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
@@ -32,8 +28,7 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "https://api.nuget.org/v3/index.json": {},
-        "https://nuget.cdn.azure.cn/v3/index.json": {}
+        "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "netcoreapp3.1": {
@@ -63,7 +58,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.100\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.400\\RuntimeIdentifierGraph.json"
       }
     }
   }

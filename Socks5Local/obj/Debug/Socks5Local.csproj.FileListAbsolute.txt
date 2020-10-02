@@ -16,3 +16,13 @@ C:\Users\SmRiley\OneDrive\source\repos\Socks5Server\Socks5Local\obj\Debug\Socks5
 C:\Users\SmRiley\OneDrive\source\repos\Socks5Server\Socks5Local\obj\Debug\Socks5Local.csproj.GenerateResource.cache
 C:\Users\SmRiley\OneDrive\source\repos\Socks5Server\Socks5Local\obj\Debug\Socks5Local.exe
 C:\Users\SmRiley\OneDrive\source\repos\Socks5Server\Socks5Local\obj\Debug\Socks5Local.pdb
+C:\Users\SmRiley\OneDrive\source\repos\SharpSocks\Socks5Local\bin\Debug\Socks5Local.exe.config
+C:\Users\SmRiley\OneDrive\source\repos\SharpSocks\Socks5Local\bin\Debug\Socks5Local.exe
+C:\Users\SmRiley\OneDrive\source\repos\SharpSocks\Socks5Local\bin\Debug\Socks5Local.pdb
+C:\Users\SmRiley\OneDrive\source\repos\SharpSocks\Socks5Local\obj\Debug\Socks5Local.csprojAssemblyReference.cache
+C:\Users\SmRiley\OneDrive\source\repos\SharpSocks\Socks5Local\obj\Debug\Socks5Local.Form1.resources
+C:\Users\SmRiley\OneDrive\source\repos\SharpSocks\Socks5Local\obj\Debug\Socks5Local.Properties.Resources.resources
+C:\Users\SmRiley\OneDrive\source\repos\SharpSocks\Socks5Local\obj\Debug\Socks5Local.csproj.GenerateResource.cache
+C:\Users\SmRiley\OneDrive\source\repos\SharpSocks\Socks5Local\obj\Debug\Socks5Local.csproj.CoreCompileInputs.cache
+C:\Users\SmRiley\OneDrive\source\repos\SharpSocks\Socks5Local\obj\Debug\Socks5Local.exe
+C:\Users\SmRiley\OneDrive\source\repos\SharpSocks\Socks5Local\obj\Debug\Socks5Local.pdb
