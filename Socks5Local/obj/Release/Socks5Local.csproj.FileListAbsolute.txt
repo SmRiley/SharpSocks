@@ -1,9 +1,0 @@
-C:\Users\SmRiley\OneDrive\source\repos\Socks5Server\Socks5Local\bin\Release\Socks5Local.exe.config
-C:\Users\SmRiley\OneDrive\source\repos\Socks5Server\Socks5Local\bin\Release\Socks5Local.exe
-C:\Users\SmRiley\OneDrive\source\repos\Socks5Server\Socks5Local\bin\Release\Socks5Local.pdb
-C:\Users\SmRiley\OneDrive\source\repos\Socks5Server\Socks5Local\obj\Release\Socks5Local.csprojAssemblyReference.cache
-C:\Users\SmRiley\OneDrive\source\repos\Socks5Server\Socks5Local\obj\Release\Socks5Local.Form1.resources
-C:\Users\SmRiley\OneDrive\source\repos\Socks5Server\Socks5Local\obj\Release\Socks5Local.Properties.Resources.resources
-C:\Users\SmRiley\OneDrive\source\repos\Socks5Server\Socks5Local\obj\Release\Socks5Local.csproj.GenerateResource.cache
-C:\Users\SmRiley\OneDrive\source\repos\Socks5Server\Socks5Local\obj\Release\Socks5Local.exe
-C:\Users\SmRiley\OneDrive\source\repos\Socks5Server\Socks5Local\obj\Release\Socks5Local.pdb

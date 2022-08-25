@@ -1,4 +1,5 @@
 ﻿global using static Server.DataHandle;
+global using static Share.Utils;
 using Server.Core;
 using System.Net;
 using System.Text.Json.Nodes;

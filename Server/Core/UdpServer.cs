@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Linq;
+using System.Net.Http;
 
 namespace Server.Core;
 
@@ -18,23 +19,22 @@ class UdpServer
         ClientPoint = ipEndpoint;
         TcpClient = tcpClient;
         UdpClient = new UdpClient(0);
-        UdpClient.Client.ReceiveTimeout = 1000 * 15;
-        UdpClient.Client.SendTimeout = 1000 * 15;
         _callBackAsync = callBackFunc;
-        _ = UDPRecieveAsync();
+        _ = UdpRecieveAsync();
     }
 
     /// <summary>
     /// UDP接收回调
     /// </summary>
     /// <param name="ar"></param>
-    private async Task UDPRecieveAsync()
+    private async Task UdpRecieveAsync()
     {
         try
         {
             while (true)
             {
-                var receiveInfo = await UdpClient.ReceiveAsync();
+                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+                var receiveInfo = await UdpClient.ReceiveAsync(cts.Token);
                 if (receiveInfo.Buffer.Length > 0)
                 {
                     if (_proxyPointList.Contains(receiveInfo.RemoteEndPoint))
@@ -44,10 +44,15 @@ class UdpServer
                         await _callBackAsync(ClientPoint, EnBytes(Send_Data));
                     }
                 }
+                else
+                {
+                    UdpClient.Dispose();
+                    break;
+                }
             }
 
         }
-        catch (Exception)
+        catch (SocketException)
         {
 
         }
@@ -75,5 +80,11 @@ class UdpServer
         {
 
         }
+    }
+
+    ~UdpServer()
+    {
+        UdpClient.Dispose();
+        TcpClient.Dispose();
     }
 }

@@ -13,7 +13,7 @@ class TcpListen
 
     public TcpListen(IPAddress ip, int port, string pass, bool udpSupport = true)
     {
-        Key = GetPass(pass);
+        Key = GetPassBytes(pass);
         _tcpListener = new TcpListener(ip, port);
         if (udpSupport)
         {
@@ -56,68 +56,67 @@ class TcpListen
     /// <param name="tcpClient"></param>
     private async Task TcpConnectAsync(TcpClient tcpClient)
     {
-        WriteLog($"接收来自{tcpClient.Client.RemoteEndPoint}连接请求");
         NetworkStream tcpStream = tcpClient.GetStream();
-        var recLen = await tcpStream.ReadAsync(_dataBuff.AsMemory(0, buffSize));
-        var data = DeBytes(_dataBuff[..recLen]);
         try
         {
-            if (data.Length > 0)
+            var cts = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+            var recLen = await tcpStream.ReadAsync(_dataBuff.AsMemory(0, buffSize),cts.Token);
+            if(recLen == 0)
             {
-                var isNoAuth = IsNoAuth(data);
-                var type = GetProxyType(data);
-                //首次请求建立连接
-                if (isNoAuth)
+                tcpClient.Dispose();
+                return;
+            }
+            var data = DeBytes(_dataBuff[..recLen]);
+            var isNoAuth = IsNoAuth(data);
+            var type = GetProxyType(data);
+            //首次请求建立连接
+            if (isNoAuth)
+            {
+                WriteLog($"接收来自{tcpClient.Client.RemoteEndPoint}连接请求");
+                await TcpSendAsync(tcpClient, No_Authentication_Required);
+                _ = TcpConnectAsync(tcpClient);
+            }
+            //已建立连接,判断代理目标端信息
+            else if (type is not ProxyTypeEnum.Connection or ProxyTypeEnum.Unknown)
+            {
+                var proxyInfo = GetProxyInfo(data);
+                if (proxyInfo.Type is 1)
                 {
-                    await TcpSendAsync(tcpClient, No_Authentication_Required);
-                    _ = TcpConnectAsync(tcpClient);
-                }
-                //已建立连接,判断代理目标端信息
-                else if (type is not ProxyTypeEnum.Connection or ProxyTypeEnum.Unknown)
-                {
-                    var proxyInfo = GetProxyInfo(data);
-                    if (proxyInfo.Type is 1)
+                    //TCP
+                    TcpClient tcpProxy = TcpConnecte(proxyInfo.IP, proxyInfo.Port);
+                    if (tcpProxy.Connected)
                     {
-                        //TCP
-                        TcpClient tcpProxy = TcpConnecte(proxyInfo.IP, proxyInfo.Port);
-                        if (tcpProxy.Connected)
-                        {
-                            new TcpServer(tcpClient, tcpProxy);
-                            await TcpSendAsync(tcpClient, Proxy_Success);
-                        }
-                        else
-                        {
-                            await TcpSendAsync(tcpClient, Connect_Fail);
-                            throw new SocketException();
-                        }
+                        _ = new TcpServer(tcpClient, tcpProxy);
+                        await TcpSendAsync(tcpClient, Proxy_Success);
                     }
-                    else if (proxyInfo.Type is 3)
+                    else
                     {
-                        //UDP 
-                        //判断是否开启UDP支持及UDP阈值
-                        if (udpListen is not null && UdpListen.SurplusProxyNum > 0)
-                        {
-                            //得到客户端开放UDP端口
-                            var ClientPoint = new IPEndPoint(((IPEndPoint)tcpClient.Client.RemoteEndPoint!).Address, proxyInfo.Port);
-                            udpListen.AddServer(ClientPoint, tcpClient);
-                            byte[] header = GetUdpHeader((IPEndPoint)tcpClient.Client.LocalEndPoint!);
-                            await TcpSendAsync(tcpClient, header);
-                        }
-                        else
-                        {
-                            throw new NotSupportedException("未启用UDP,此转发请求已被放弃");
-                        }
+                        await TcpSendAsync(tcpClient, Connect_Fail);
+                        throw new SocketException();
                     }
                 }
-                else
+                else if (proxyInfo.Type is 3)
                 {
-                    //不为连接且不为转发,有可能是密码错误
-                    throw new NotSupportedException("未知转发类型或者密码错误,此连接将被关闭.");
+                    //UDP 
+                    //判断是否开启UDP支持及UDP阈值
+                    if (udpListen is not null && UdpListen.SurplusProxyNum > 0)
+                    {
+                        //得到客户端开放UDP端口
+                        var ClientPoint = new IPEndPoint(((IPEndPoint)tcpClient.Client.RemoteEndPoint!).Address, proxyInfo.Port);
+                        udpListen.AddServer(ClientPoint, tcpClient);
+                        byte[] header = GetUdpHeader((IPEndPoint)tcpClient.Client.LocalEndPoint!);
+                        await TcpSendAsync(tcpClient, header);
+                    }
+                    else
+                    {
+                        throw new NotSupportedException("未启用UDP,此转发请求已被放弃");
+                    }
                 }
             }
             else
             {
-                throw new SocketException();
+                //不为连接且不为转发,有可能是密码错误
+                throw new NotSupportedException("未知转发类型或者密码错误,此连接将被关闭.");
             }
         }
         catch (Exception ex) when (ex is SocketException or NotSupportedException)
@@ -146,7 +145,6 @@ class TcpListen
         }
         finally
         {
-            tcpClient.GetStream().Close();
             tcpClient.Close();
         }
     }

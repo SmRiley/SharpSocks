@@ -1,12 +1,10 @@
-﻿using System.Net.Sockets;
-using System;
+﻿using System.Net.Http;
+using System.Net.Sockets;
 
 namespace Server.Core;
 
 class TcpServer
 {
-
-
     private const int _buffSize = 1024 * 50;
     private readonly byte[] _clientBuff = new byte[_buffSize];
     private readonly byte[] _proxyBuff = new byte[_buffSize];
@@ -29,13 +27,20 @@ class TcpServer
     /// <summary>
     /// 发送数据
     /// </summary>
-    /// <param name="TcpStream">TCP流</param>
+    /// <param name="stream">TCP流</param>
     /// <param name="data">数据</param>
-    private async Task TcpSendAsync(NetworkStream TcpStream, byte[] data)
+    private async Task TcpSendAsync(NetworkStream stream, byte[] data)
     {
         try
         {
-            await TcpStream.WriteAsync(data);
+            if(data.Length > 0)
+            {
+                await stream.WriteAsync(data);
+            }
+            else
+            {
+                throw new SocketException();
+            }
         }
         catch (SocketException)
         {
@@ -49,24 +54,19 @@ class TcpServer
     /// <param name="ar"></param>
     private async Task TcpClientReceive()
     {
-        try
+        while (true)
         {
-            while (true)
+            try
             {
-                var recLen = await _clientStream.ReadAsync(_clientBuff.AsMemory(0, _buffSize));
-                if (recLen > 0)
-                {
-                    await TcpSendAsync(_proxyStream, DeBytes(_clientBuff[..recLen]));
-                }
-                else
-                {
-                    ProxyClose();
-                }
+                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+                var recLen = await _clientStream.ReadAsync(_clientBuff.AsMemory(0, _buffSize),cts.Token);
+                await TcpSendAsync(_proxyStream, DeBytes(_clientBuff[..recLen]));
+
             }
-        }
-        catch (SocketException)
-        {
-            ProxyClose();
+            catch (SocketException)
+            {
+                ProxyClose();
+            }
         }
     }
 
@@ -80,15 +80,9 @@ class TcpServer
         {
             while (true)
             {
-                var recLen = await _proxyStream.ReadAsync(_proxyBuff.AsMemory(0, _buffSize));
-                if (recLen > 0)
-                {
-                    await TcpSendAsync(_clientStream, EnBytes(_proxyBuff[..recLen]));
-                }
-                else
-                {
-                    ProxyClose();
-                }
+                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+                var recLen = await _proxyStream.ReadAsync(_proxyBuff.AsMemory(0, _buffSize),cts.Token);
+                await TcpSendAsync(_clientStream, EnBytes(_proxyBuff[..recLen]));
             }
         }
         catch (SocketException)
@@ -102,33 +96,22 @@ class TcpServer
     /// </summary>
     private void ProxyClose()
     {
-        try
+        if (_client.Connected)
         {
-            if (_client.Connected)
-            {
 
-                WriteLog($"已断开客户端{_client.Client.RemoteEndPoint}的连接");
-                _clientStream.Close();
-                _client.Close();
-            }
-            if (_proxy.Connected)
-            {
-                WriteLog($"已断开代理端{_proxy.Client.RemoteEndPoint}的连接");
-                _proxyStream.Close();
-                _proxy.Close();
-            }
+            WriteLog($"已断开客户端{_client.Client.RemoteEndPoint}的连接");
+            _client.Dispose();
         }
-        catch (Exception)
+        if (_proxy.Connected)
         {
-
+            WriteLog($"已断开代理端{_proxy.Client.RemoteEndPoint}的连接");
+            _proxy.Dispose();
         }
     }
 
     ~TcpServer()
     {
         _client?.Dispose();
-        _clientStream?.Dispose();
         _proxy?.Dispose();
-        _proxyStream?.Dispose();
     }
 }

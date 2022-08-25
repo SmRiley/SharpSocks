@@ -1,8 +1,8 @@
 [
   {
-    "Port": 1080,
+    "Port": 3080,
     "Pass": "123456",
-    "Udp": false
+    "Udp": true
   },
   {
     "Port": 2080,
