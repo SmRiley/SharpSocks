@@ -3,15 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32811.315
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Socks5Server", "Socks5Server\Socks5Server.csproj", "{A1ADF487-CF4E-48EB-BD69-1C20F89C1A22}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Client", "Client\Client.csproj", "{7697F59D-93B3-426E-A118-186B0BA7844A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Socks5Local", "Socks5Local\Socks5Local.csproj", "{BB501B6B-54B7-4421-A092-D95CF3D55F37}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Share", "Share\Share.csproj", "{85D86520-420E-469D-9A68-C63AFE3E5017}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Client\Client.csproj", "{7697F59D-93B3-426E-A118-186B0BA7844A}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Share", "Share\Share.csproj", "{85D86520-420E-469D-9A68-C63AFE3E5017}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Server\Server.csproj", "{0F3C0C0E-68E7-4DC5-8402-2B4C1019D962}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Server", "Server\Server.csproj", "{0F3C0C0E-68E7-4DC5-8402-2B4C1019D962}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,14 +15,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{A1ADF487-CF4E-48EB-BD69-1C20F89C1A22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A1ADF487-CF4E-48EB-BD69-1C20F89C1A22}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A1ADF487-CF4E-48EB-BD69-1C20F89C1A22}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A1ADF487-CF4E-48EB-BD69-1C20F89C1A22}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BB501B6B-54B7-4421-A092-D95CF3D55F37}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BB501B6B-54B7-4421-A092-D95CF3D55F37}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BB501B6B-54B7-4421-A092-D95CF3D55F37}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BB501B6B-54B7-4421-A092-D95CF3D55F37}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7697F59D-93B3-426E-A118-186B0BA7844A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7697F59D-93B3-426E-A118-186B0BA7844A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7697F59D-93B3-426E-A118-186B0BA7844A}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
