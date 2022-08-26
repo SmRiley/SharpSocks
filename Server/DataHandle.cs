@@ -33,7 +33,7 @@ class DataHandle
     /// <param name="str">需打印字符串</param>
     public static void WriteLog(string str)
     {
-        Console.WriteLine(DateTime.Now + $":{str}");
+        Console.WriteLine($"{DateTime.Now} : {str}\n\r");
     }
 
     /// <summary>
@@ -128,7 +128,7 @@ class DataHandle
                         hostIp = new IPAddress(Data.Skip(4).Take(4).ToArray());
                         portBytes = (Data.Skip(8).Take(2).ToArray());
                         port = (portBytes[0] << 8) + portBytes[1];
-                        WriteLog($"接收对IPV4:{hostIp}:{port}的代理请求");
+                        WriteLog($"Receive tcp Ipv4 proxy request to {hostIp}:{port}");
                         break;
                     case ProxyTypeEnum.TcpProxyDomain or ProxyTypeEnum.UdpProxyDomain:
                         //域名解析IP
@@ -136,14 +136,14 @@ class DataHandle
                         hostIp = Dns.GetHostEntry(Realm_Name).AddressList[0];
                         portBytes = (Data.Skip(5 + Data[4]).Take(2).ToArray());
                         port = (portBytes[0] << 8) + portBytes[1];
-                        WriteLog($"接收对{Realm_Name}({hostIp}:{port})的代理请求");
+                        WriteLog($"Receive tcp proxy request to {Realm_Name}({hostIp}:{port})");
                         break;
                     case ProxyTypeEnum.TcpProxyIPV6 or ProxyTypeEnum.UdpProxyIPV6:
                         //IPV6
                         hostIp = new IPAddress(Data.Skip(4).Take(16).ToArray());
                         portBytes = (Data.Skip(8).Take(2).ToArray());
                         port = (portBytes[0] << 8) + portBytes[1];
-                        WriteLog($"接收对IPV6:{hostIp}:{port}的代理请求");
+                        WriteLog($"Receive tcp Ipv6 proxy request to {hostIp}:{port}的代理请求");
                         break;
                 }
 

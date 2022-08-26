@@ -71,7 +71,7 @@ class UdpServer
     {
         try
         {
-            WriteLog($"已关闭{ClientPoint}的UDP代理隧道");
+            WriteLog($"Close the udp proxy tunnel to {ClientPoint}");
             UdpClient.Close();
             TcpClient.GetStream().Close();
             TcpClient.Close();

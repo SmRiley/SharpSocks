@@ -21,7 +21,7 @@ class TcpServer
         _proxyStream = _proxy.GetStream();
         _ = TcpClientReceive();
         _ = TcpProxyReceive();
-        WriteLog($"开启对{_client.Client.RemoteEndPoint}的TCP代理隧道");
+        WriteLog($"Open the tcp proxy tunnel to {_client.Client.RemoteEndPoint}");
     }
 
     /// <summary>
@@ -99,12 +99,12 @@ class TcpServer
         if (_client.Connected)
         {
 
-            WriteLog($"已断开客户端{_client.Client.RemoteEndPoint}的连接");
+            WriteLog($"Close the client connection to {_client.Client.RemoteEndPoint}");
             _client.Dispose();
         }
         if (_proxy.Connected)
         {
-            WriteLog($"已断开代理端{_proxy.Client.RemoteEndPoint}的连接");
+            WriteLog($"Close the proxy connection to {_proxy.Client.RemoteEndPoint}");
             _proxy.Dispose();
         }
     }

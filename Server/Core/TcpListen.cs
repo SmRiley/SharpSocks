@@ -19,7 +19,7 @@ class TcpListen
         {
             udpListen = new UdpListen(port);
         }
-        WriteLog($"Socks服务初始化,监听{port}端口,UDP支持:{udpSupport}");
+        WriteLog($"Socks Service init,Listen on port {port}, udp support status : {udpSupport}");
     }
 
     public async Task StartAsync()
@@ -34,9 +34,9 @@ class TcpListen
                 _ = TcpConnectAsync(tcpClient);
             }
         }
-        catch (SocketException)
+        catch (SocketException ex)
         {
-            WriteLog($"端口{((IPEndPoint)_tcpListener.LocalEndpoint).Port}被占用,监听服务开启失败");
+            WriteLog(ex.Message);
         }
     }
 
@@ -72,7 +72,7 @@ class TcpListen
             //首次请求建立连接
             if (isNoAuth)
             {
-                WriteLog($"接收来自{tcpClient.Client.RemoteEndPoint}连接请求");
+                WriteLog($"receive connection request from {tcpClient.Client.RemoteEndPoint}");
                 await TcpSendAsync(tcpClient, No_Authentication_Required);
                 _ = TcpConnectAsync(tcpClient);
             }
@@ -109,14 +109,14 @@ class TcpListen
                     }
                     else
                     {
-                        throw new NotSupportedException("未启用UDP,此转发请求已被放弃");
+                        throw new NotSupportedException("UDP support is disenable,the udp proxy request will be throw away");
                     }
                 }
             }
             else
             {
                 //不为连接且不为转发,有可能是密码错误
-                throw new NotSupportedException("未知转发类型或者密码错误,此连接将被关闭.");
+                throw new NotSupportedException("Unknown forwarding type or wrong password, this connection will be closed.");
             }
         }
         catch (Exception ex) when (ex is SocketException or NotSupportedException)
@@ -136,7 +136,7 @@ class TcpListen
         {
             if (tcpClient.Connected)
             {
-                WriteLog($"已关闭客户端{tcpClient.Client.RemoteEndPoint}的连接");
+                WriteLog($"Close the client connection to {tcpClient.Client.RemoteEndPoint}");
             }
         }
         catch (SocketException sex)

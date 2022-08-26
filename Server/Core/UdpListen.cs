@@ -40,7 +40,7 @@ class UdpListen
             _udpProxyList.Add((Udp_Server.ClientPoint, Udp_Server));
         }
         SurplusProxyNum--;
-        WriteLog($"已开启对{ipEndPoint}的UDP代理隧道");
+        WriteLog($"Open the udp proxy tunnel to {ipEndPoint}");
 
     }
 
