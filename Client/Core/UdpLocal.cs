@@ -28,7 +28,8 @@ class UdpLocal:IDisposable
         {
             while (true)
             {
-                var recResult = await _udpClient.ReceiveAsync();
+                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+                var recResult = await _udpClient.ReceiveAsync(cts.Token);
                 if(recResult.Buffer.Length <= 0)
                 {
                     throw new SocketException();
@@ -52,12 +53,13 @@ class UdpLocal:IDisposable
 
     async Task UdpSendAsync(IPEndPoint remotePoint,byte[] data)
     {
-        await _udpClient.SendAsync(data,remotePoint);
+        var cts = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+        await _udpClient.SendAsync(data,remotePoint,cts.Token);
     }
 
     public void Dispose()
     {
-        _udpClient.Close();
         _udpClient.Dispose();
+        GC.SuppressFinalize(this);
     }
 }

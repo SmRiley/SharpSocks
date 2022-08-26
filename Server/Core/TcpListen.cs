@@ -59,7 +59,7 @@ class TcpListen
         NetworkStream tcpStream = tcpClient.GetStream();
         try
         {
-            var cts = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+            var cts = new CancellationTokenSource(TimeSpan.FromSeconds(35));
             var recLen = await tcpStream.ReadAsync(_dataBuff.AsMemory(0, buffSize),cts.Token);
             if(recLen == 0)
             {

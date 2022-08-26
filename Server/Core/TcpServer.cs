@@ -58,7 +58,7 @@ class TcpServer
         {
             try
             {
-                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(35));
                 var recLen = await _clientStream.ReadAsync(_clientBuff.AsMemory(0, _buffSize),cts.Token);
                 await TcpSendAsync(_proxyStream, DeBytes(_clientBuff[..recLen]));
 
@@ -80,7 +80,7 @@ class TcpServer
         {
             while (true)
             {
-                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(35));
                 var recLen = await _proxyStream.ReadAsync(_proxyBuff.AsMemory(0, _buffSize),cts.Token);
                 await TcpSendAsync(_clientStream, EnBytes(_proxyBuff[..recLen]));
             }

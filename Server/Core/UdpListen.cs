@@ -69,7 +69,10 @@ class UdpListen
     /// <param name="data">待发送数据</param>
     private async Task BackToSourceAsync(IPEndPoint clientPoint, byte[] data)
     {
-        await _udpClient.SendAsync(data, data.Length, clientPoint);
+        if(data.Length > 0)
+        {
+            await _udpClient.SendAsync(data, data.Length, clientPoint);
+        }
     }
 
     /// <summary>
@@ -80,7 +83,8 @@ class UdpListen
     {
         while (true)
         {
-            var recResult = await _udpClient.ReceiveAsync();
+            var cts = new CancellationTokenSource(TimeSpan.FromSeconds(60));
+            var recResult = await _udpClient.ReceiveAsync(cts.Token);
             var data = DeBytes(recResult.Buffer);
             int header_len = 0;
             var rs = GetWhichClient(recResult.RemoteEndPoint);

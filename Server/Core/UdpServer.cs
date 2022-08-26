@@ -33,7 +33,7 @@ class UdpServer
         {
             while (true)
             {
-                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(60));
                 var receiveInfo = await UdpClient.ReceiveAsync(cts.Token);
                 if (receiveInfo.Buffer.Length > 0)
                 {

@@ -4,7 +4,7 @@ using System.Runtime.Versioning;
 using Timer = System.Timers.Timer;
 namespace Client.Core;
 
-class TcpListen:IDisposable
+class TcpListen : IDisposable
 {
     private int _port;
     private int _localPort;
@@ -13,7 +13,6 @@ class TcpListen:IDisposable
     private static Timer _checkerTimer = new(10000);
 
     private readonly TcpListener _tcpListener;
-    private CancellationTokenSource? ListenerCts;
     public TcpListen(string ipAddr, int port, string pass, int localPort)
     {
         _ip = ipAddr;
@@ -21,12 +20,11 @@ class TcpListen:IDisposable
         _localPort = localPort;
         Key = GetPassBytes(pass);
         _tcpListener = new TcpListener(IPAddress.Any, _localPort);
-        _checkerTimer.Elapsed += (s, e) => TcpListen.CheckTcpTimer();
+        _checkerTimer.Elapsed += (s, e) => CheckTcpTimer();
     }
 
     public void Start()
     {
-        ListenerCts = new CancellationTokenSource();
         _tcpListener.Start();
         _ = AcceptTcpAsync();
         _checkerTimer.Start();
@@ -35,37 +33,33 @@ class TcpListen:IDisposable
     public void Stop()
     {
         _tcpListener.Stop();
-        ListenerCts?.Cancel();
     }
 
     private async Task AcceptTcpAsync()
     {
-        await Task.Run(async () =>
+        try
         {
-            try
+            while (true)
             {
-                while (true)
-                {
-                    var tcpClient = await _tcpListener.AcceptTcpClientAsync();
-                    _ = new TCPLocal(tcpClient, new TcpClient(_ip, _port));
-                }
+                var tcpClient = await _tcpListener.AcceptTcpClientAsync();
+                _ = new TcpLocal(tcpClient, new TcpClient(_ip, _port));
             }
-            catch (SocketException)
-            {
+        }
+        catch (SocketException)
+        {
 
-            }
-        },ListenerCts!.Token);
+        }
     }
 
     static void CheckTcpTimer()
     {
-        foreach (var i in TCPLocal.UdpList.ToArray())
+        foreach (var i in TcpLocal.UdpList.ToArray())
         {
             if (!CheckTcpUsability(i.tcpClient))
             {
                 i.tcpClient.Dispose();
                 i.UdpLocal.Dispose();
-                TCPLocal.UdpList.Remove(i);
+                TcpLocal.UdpList.Remove(i);
             }
         }
     }
@@ -73,5 +67,6 @@ class TcpListen:IDisposable
     public void Dispose()
     {
         _tcpListener.Stop();
+        GC.SuppressFinalize(this);
     }
 }

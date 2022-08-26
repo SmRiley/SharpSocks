@@ -4,7 +4,7 @@ using System.Net.Sockets;
 
 namespace Client.Core;
 
-class TCPLocal : IDisposable
+class TcpLocal : IDisposable
 {
     private readonly byte[] _proxyBuff = new byte[1024 * 50];
     private readonly byte[] _localBuff = new byte[1024 * 50];
@@ -14,7 +14,7 @@ class TCPLocal : IDisposable
     private readonly TcpClient _proxy;
     private readonly NetworkStream _clientStream;
     private readonly NetworkStream _proxyStream;
-    public TCPLocal(TcpClient Client, TcpClient Proxy)
+    public TcpLocal(TcpClient Client, TcpClient Proxy)
     {
         _client = Client;
         _proxy = Proxy;
@@ -28,9 +28,17 @@ class TCPLocal : IDisposable
     {
         try
         {
-            await stream.WriteAsync(data);
+            if(data.Length > 0)
+            {
+                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+                await stream.WriteAsync(data,cts.Token);
+            }
+            else
+            {
+                throw new SocketException();
+            }
         }
-        catch (SocketException)
+        catch (Exception ex)when(ex is SocketException or TimeoutException)
         {
             Dispose();
         }
@@ -46,12 +54,13 @@ class TCPLocal : IDisposable
         {
             while (true)
             {
-                var recLen = await _clientStream.ReadAsync(_localBuff);
+                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(35));
+                var recLen = await _clientStream.ReadAsync(_localBuff,cts.Token);
                 var data = EnBytes(_localBuff[..recLen]);
                 await TcpSendAsync(_proxyStream, data);
             }
         }
-        catch (Exception ex) when (ex is SocketException or IOException or ObjectDisposedException)
+        catch (Exception ex) when (ex is SocketException or IOException or ObjectDisposedException or TimeoutException)
         {
             Dispose();
         }
@@ -66,16 +75,17 @@ class TCPLocal : IDisposable
     {
         try
         {
-            var recLen = await _proxyStream.ReadAsync(_proxyBuff);
+            var cts = new CancellationTokenSource(TimeSpan.FromSeconds(35));
+            var recLen = await _proxyStream.ReadAsync(_proxyBuff,cts.Token);
             var data = DeBytes(_proxyBuff[..recLen]);
             if (ar == 2)
             {
-                var remoteipEndpoint = _proxy.Client.RemoteEndPoint as IPEndPoint;
+                var remoteipEndpoint = _proxy.Client?.RemoteEndPoint as IPEndPoint;
                 if (remoteipEndpoint is not null)
                 {
                     var udpLocal = new UdpLocal(remoteipEndpoint);
-                    await TcpSendAsync(_clientStream, DataHandle.ExUdp(data, udpLocal.UdpPort));
-                    if (DataHandle.IsUdpInit(data))
+                    await TcpSendAsync(_clientStream, ExUdp(data, udpLocal.UdpPort));
+                    if (IsUdpInit(data))
                     {
                         UdpList.Add((_client, udpLocal));
                     }
@@ -91,7 +101,7 @@ class TCPLocal : IDisposable
                 _ = ProxyReadInitAsync(++ar);
             }
         }
-        catch (Exception ex) when (ex is SocketException or IOException or ObjectDisposedException)
+        catch (Exception ex) when (ex is SocketException or IOException or ObjectDisposedException or OperationCanceledException)
         {
             Dispose();
         }
@@ -107,12 +117,13 @@ class TCPLocal : IDisposable
         {
             while (true)
             {
-                var recLen = await _proxyStream.ReadAsync(_proxyBuff);
+                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(35));
+                var recLen = await _proxyStream.ReadAsync(_proxyBuff,cts.Token);
                 var data = DeBytes(_proxyBuff[..recLen]);
                 await TcpSendAsync(_clientStream, data);
             }
         }
-        catch (Exception ex) when (ex is SocketException or IOException or ObjectDisposedException)
+        catch (Exception ex) when (ex is SocketException or IOException or ObjectDisposedException or OperationCanceledException)
         {
             Dispose();
         }
@@ -122,5 +133,6 @@ class TCPLocal : IDisposable
     {
         _client.Dispose();
         _proxy.Dispose();
+        GC.SuppressFinalize(this);
     }
 }
