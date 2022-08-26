@@ -75,10 +75,8 @@ public class Utils
     {
         try
         {
-            var foos = IPGlobalProperties.GetIPGlobalProperties()
-            ?.GetActiveTcpConnections();
-
-            var foo = foos?.FirstOrDefault(x => x.LocalEndPoint.Equals(tcpClient.Client.LocalEndPoint));
+            var foos = IPGlobalProperties.GetIPGlobalProperties()?.GetActiveTcpConnections();
+            var foo = foos?.FirstOrDefault(x => x.LocalEndPoint.Equals(tcpClient.Client?.LocalEndPoint));
             return foo?.State is TcpState.Established;
         }
         catch (NetworkInformationException)
