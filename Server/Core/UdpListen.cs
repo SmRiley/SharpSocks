@@ -1,11 +1,10 @@
 ﻿using System.Net;
-using System.Net.Http;
 using System.Net.Sockets;
 using Timer = System.Timers.Timer;
 
 namespace Server.Core;
 
-class UdpListen
+internal class UdpListen
 {
 
     private readonly List<(IPAddress IP_Addr, TcpClient TCP_Client)> _initAddrList = new();
@@ -69,7 +68,7 @@ class UdpListen
     /// <param name="data">待发送数据</param>
     private async Task BackToSourceAsync(IPEndPoint clientPoint, byte[] data)
     {
-        if(data.Length > 0)
+        if (data.Length > 0)
         {
             await _udpClient.SendAsync(data, data.Length, clientPoint);
         }

@@ -1,10 +1,9 @@
 ﻿using System.Net;
 using System.Net.Sockets;
-using System.Runtime.Versioning;
 using Timer = System.Timers.Timer;
 namespace Client.Core;
 
-class TcpListen : IDisposable
+internal class TcpListen : IDisposable
 {
     private int _port;
     private int _localPort;
@@ -51,7 +50,7 @@ class TcpListen : IDisposable
         }
     }
 
-    static void CheckTcpTimer()
+    private static void CheckTcpTimer()
     {
         foreach (var i in TcpLocal.UdpList.ToArray())
         {

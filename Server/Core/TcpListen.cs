@@ -3,7 +3,7 @@ using System.Net.Sockets;
 
 namespace Server.Core;
 
-class TcpListen
+internal class TcpListen
 {
     private const int buffSize = 1024 * 15;
     private const int timeout = 1000 * 5;
@@ -60,8 +60,8 @@ class TcpListen
         try
         {
             var cts = new CancellationTokenSource(TimeSpan.FromSeconds(35));
-            var recLen = await tcpStream.ReadAsync(_dataBuff.AsMemory(0, buffSize),cts.Token);
-            if(recLen == 0)
+            var recLen = await tcpStream.ReadAsync(_dataBuff.AsMemory(0, buffSize), cts.Token);
+            if (recLen == 0)
             {
                 tcpClient.Dispose();
                 return;

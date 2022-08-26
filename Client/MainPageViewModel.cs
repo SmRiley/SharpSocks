@@ -1,8 +1,5 @@
 ﻿using Client.Core;
-using System.Text.Json;
 using CommunityToolkit.Mvvm.ComponentModel;
-using System.Text.Json.Nodes;
-using System.Text;
 
 namespace Client;
 internal class MainPageViewModel : ObservableObject
@@ -21,10 +18,10 @@ internal class MainPageViewModel : ObservableObject
 
     public void ExExecutionAsync()
     {
-        if(BtnContext == "启动")
+        if (BtnContext == "启动")
         {
             Key = GetPassBytes(Pass);
-            tcpListen = new TcpListen(IpAddress, int.Parse(Port), Pass,int.Parse(LocalPort));
+            tcpListen = new TcpListen(IpAddress, int.Parse(Port), Pass, int.Parse(LocalPort));
             tcpListen.Start();
             Enable = false;
             BtnContext = "停止";

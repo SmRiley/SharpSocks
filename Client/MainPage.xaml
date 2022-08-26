@@ -11,10 +11,10 @@
 		<VerticalStackLayout Spacing="25"
 							 Padding="30,0"
 							 VerticalOptions="Center">
-			<Editor Placeholder="请输入远程服务器IP"
+			<Editor Placeholder="请输入Host IP"
 					Text="{Binding IpAddress}"
 					IsEnabled="{Binding Enable}" />
-			<Editor Placeholder="请输入远程服务器Port"
+			<Editor Placeholder="请输入Host Port"
 					MaxLength="6"
 					Text="{Binding Port}"
 					IsEnabled="{Binding Enable}" />

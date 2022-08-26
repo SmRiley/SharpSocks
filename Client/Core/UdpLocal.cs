@@ -1,10 +1,9 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Net.Sockets;
 
 namespace Client.Core;
 
-class UdpLocal:IDisposable
+internal class UdpLocal : IDisposable
 {
     private readonly UdpClient _udpClient = new(0);
     private IPEndPoint? _localPoint;
@@ -30,7 +29,7 @@ class UdpLocal:IDisposable
             {
                 var cts = new CancellationTokenSource(TimeSpan.FromSeconds(15));
                 var recResult = await _udpClient.ReceiveAsync(cts.Token);
-                if(recResult.Buffer.Length <= 0)
+                if (recResult.Buffer.Length <= 0)
                 {
                     throw new SocketException();
                 }
@@ -45,16 +44,16 @@ class UdpLocal:IDisposable
                 }
             }
         }
-        catch (Exception ex)when(ex is SocketException or ObjectDisposedException)
+        catch (Exception ex) when (ex is SocketException or ObjectDisposedException)
         {
             Dispose();
         }
     }
 
-    async Task UdpSendAsync(IPEndPoint remotePoint,byte[] data)
+    private async Task UdpSendAsync(IPEndPoint remotePoint, byte[] data)
     {
         var cts = new CancellationTokenSource(TimeSpan.FromSeconds(15));
-        await _udpClient.SendAsync(data,remotePoint,cts.Token);
+        await _udpClient.SendAsync(data, remotePoint, cts.Token);
     }
 
     public void Dispose()

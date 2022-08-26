@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
+﻿using System.Net;
 using System.Net.Sockets;
-using System.Linq;
-using System.Net.Http;
 
 namespace Server.Core;
 
-class UdpServer
+internal class UdpServer
 {
     private readonly List<IPEndPoint> _proxyPointList = new();
     private readonly Func<IPEndPoint, byte[], Task> _callBackAsync;

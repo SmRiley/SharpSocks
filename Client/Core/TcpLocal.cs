@@ -1,10 +1,9 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Net.Sockets;
 
 namespace Client.Core;
 
-class TcpLocal : IDisposable
+internal class TcpLocal : IDisposable
 {
     private readonly byte[] _proxyBuff = new byte[1024 * 50];
     private readonly byte[] _localBuff = new byte[1024 * 50];
@@ -28,17 +27,17 @@ class TcpLocal : IDisposable
     {
         try
         {
-            if(data.Length > 0)
+            if (data.Length > 0)
             {
                 var cts = new CancellationTokenSource(TimeSpan.FromSeconds(15));
-                await stream.WriteAsync(data,cts.Token);
+                await stream.WriteAsync(data, cts.Token);
             }
             else
             {
                 throw new SocketException();
             }
         }
-        catch (Exception ex)when(ex is SocketException or TimeoutException)
+        catch (Exception ex) when (ex is SocketException or TimeoutException)
         {
             Dispose();
         }
@@ -55,7 +54,7 @@ class TcpLocal : IDisposable
             while (true)
             {
                 var cts = new CancellationTokenSource(TimeSpan.FromSeconds(35));
-                var recLen = await _clientStream.ReadAsync(_localBuff,cts.Token);
+                var recLen = await _clientStream.ReadAsync(_localBuff, cts.Token);
                 var data = EnBytes(_localBuff[..recLen]);
                 await TcpSendAsync(_proxyStream, data);
             }
@@ -76,7 +75,7 @@ class TcpLocal : IDisposable
         try
         {
             var cts = new CancellationTokenSource(TimeSpan.FromSeconds(35));
-            var recLen = await _proxyStream.ReadAsync(_proxyBuff,cts.Token);
+            var recLen = await _proxyStream.ReadAsync(_proxyBuff, cts.Token);
             var data = DeBytes(_proxyBuff[..recLen]);
             if (ar == 2)
             {
@@ -118,7 +117,7 @@ class TcpLocal : IDisposable
             while (true)
             {
                 var cts = new CancellationTokenSource(TimeSpan.FromSeconds(35));
-                var recLen = await _proxyStream.ReadAsync(_proxyBuff,cts.Token);
+                var recLen = await _proxyStream.ReadAsync(_proxyBuff, cts.Token);
                 var data = DeBytes(_proxyBuff[..recLen]);
                 await TcpSendAsync(_clientStream, data);
             }

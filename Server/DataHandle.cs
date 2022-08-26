@@ -1,11 +1,10 @@
 ﻿using System.Net;
-using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text;
 
 namespace Server;
 
-class DataHandle
+internal class DataHandle
 {
     /// <summary>
     /// 无需验证
@@ -242,7 +241,7 @@ class DataHandle
         {
             tcpClient.Connect(ip, port);
         }
-        catch(SocketException)
+        catch (SocketException)
         {
             tcpClient.Dispose();
         }

@@ -9,8 +9,8 @@ namespace Client;
 
 public partial class App : Application
 {
-    const int WindowWidth = 400;
-    const int WindowHeight = 550;
+    private const int WindowWidth = 400;
+    private const int WindowHeight = 550;
     public App()
     {
         InitializeComponent();

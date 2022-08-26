@@ -1,12 +1,8 @@
 ﻿using System.Net;
-using System.Net.NetworkInformation;
-using System.Net.Sockets;
-using System.Runtime.Versioning;
-using System.Text;
 
 namespace Client;
 
-class DataHandle
+internal class DataHandle
 {
     //这里的发送与接收是相对服务端的,不是对于本地端
     public static bool IsUdpInit(byte[] dat)
