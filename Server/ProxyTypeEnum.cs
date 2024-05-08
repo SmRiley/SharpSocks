@@ -3,11 +3,11 @@
 public enum ProxyTypeEnum
 {
     Connection = 1,
-    TcpProxyIPV4,
+    TcpProxyIpv4,
     TcpProxyDomain,
-    TcpProxyIPV6,
-    UdpProxyIPV4,
+    TcpProxyIpv6,
+    UdpProxyIpv4,
     UdpProxyDomain,
-    UdpProxyIPV6,
+    UdpProxyIpv6,
     Unknown = 500
 }

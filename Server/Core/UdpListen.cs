@@ -12,9 +12,9 @@ internal class UdpListen
     private readonly UdpClient _udpClient;
     private readonly Timer _timer = new(5000);
     public static int SurplusProxyNum { get; private set; } = 3000;
-    public UdpListen(int Port)
+    public UdpListen(int port)
     {
-        _udpClient = new UdpClient(Port);
+        _udpClient = new UdpClient(port);
         _ = UdpReceiveAsync();
         //检查并剔除已经失效的TcpClient
         _timer.Elapsed += (s, e) => TcpUsabilityCheck();
@@ -35,8 +35,8 @@ internal class UdpListen
         }
         else
         {
-            var Udp_Server = new UdpServer(ipEndPoint, tcpClient, BackToSourceAsync);
-            _udpProxyList.Add((Udp_Server.ClientPoint, Udp_Server));
+            var udpServer = new UdpServer(ipEndPoint, tcpClient, BackToSourceAsync);
+            _udpProxyList.Add((udpServer.ClientPoint, udpServer));
         }
         SurplusProxyNum--;
         WriteLog($"Open the udp proxy tunnel to {ipEndPoint}");
@@ -52,7 +52,7 @@ internal class UdpListen
         //循环时不要在原有列表中移除
         foreach (var i in _udpProxyList.ToArray())
         {
-            if (!CheckTcpUsability(i.Udp_Server.TcpClient))
+            if (!CheckTcpClientUsability(i.Udp_Server.TcpClient))
             {
                 i.Udp_Server.Close();
                 _udpProxyList.Remove(i);
@@ -84,27 +84,27 @@ internal class UdpListen
         {
             var cts = new CancellationTokenSource(TimeSpan.FromSeconds(60));
             var recResult = await _udpClient.ReceiveAsync(cts.Token);
-            var data = DeBytes(recResult.Buffer);
-            int header_len = 0;
+            var data = DecodeBytes(recResult.Buffer);
+            int headerLen = 0;
             var rs = GetWhichClient(recResult.RemoteEndPoint);
             if (rs is not null && data[2] == 0)
             {
                 switch (data[3])
                 {
                     case 1://IPV4
-                        header_len = 10;
+                        headerLen = 10;
                         break;
                     case 3://域名
-                        header_len = 7 + data[4];
+                        headerLen = 7 + data[4];
                         break;
                     case 4://IPV6
-                        header_len = 22;
+                        headerLen = 22;
                         break;
                 }
                 var udpAddr = GetUdpAddr(data);
                 if (udpAddr is not null)
                 {
-                    await rs.UdpSendAsync(udpAddr, data.Skip(header_len).ToArray());
+                    await rs.UdpSendAsync(udpAddr, data.Skip(headerLen).ToArray());
                 }
             }
         }
@@ -132,12 +132,12 @@ internal class UdpListen
         {
             if (_initAddrList[i].IP_Addr.Equals(remoteEndPoint.Address))
             {
-                var Udp_Server = new UdpServer(remoteEndPoint, _initAddrList[i].TCP_Client, BackToSourceAsync);
+                var udpServer = new UdpServer(remoteEndPoint, _initAddrList[i].TCP_Client, BackToSourceAsync);
                 _initAddrList.Remove(_initAddrList[i]);
-                if (Udp_Server.UdpClient != null)
+                if (udpServer.UdpClient != null)
                 {
-                    _udpProxyList.Add((Udp_Server.ClientPoint, Udp_Server));
-                    return Udp_Server;
+                    _udpProxyList.Add((udpServer.ClientPoint, udpServer));
+                    return udpServer;
                 }
             }
         }

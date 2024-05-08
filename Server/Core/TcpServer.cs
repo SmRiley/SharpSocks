@@ -4,9 +4,9 @@ namespace Server.Core;
 
 internal class TcpServer
 {
-    private const int _buffSize = 1024 * 50;
-    private readonly byte[] _clientBuff = new byte[_buffSize];
-    private readonly byte[] _proxyBuff = new byte[_buffSize];
+    private const int BuffSize = 1024 * 50;
+    private readonly byte[] _clientBuff = new byte[BuffSize];
+    private readonly byte[] _proxyBuff = new byte[BuffSize];
     private readonly TcpClient _client;
     private readonly TcpClient _proxy;
     private readonly NetworkStream _clientStream;
@@ -58,8 +58,8 @@ internal class TcpServer
             try
             {
                 var cts = new CancellationTokenSource(TimeSpan.FromSeconds(35));
-                var recLen = await _clientStream.ReadAsync(_clientBuff.AsMemory(0, _buffSize), cts.Token);
-                await TcpSendAsync(_proxyStream, DeBytes(_clientBuff[..recLen]));
+                var recLen = await _clientStream.ReadAsync(_clientBuff.AsMemory(0, BuffSize), cts.Token);
+                await TcpSendAsync(_proxyStream, DecodeBytes(_clientBuff[..recLen]));
 
             }
             catch (SocketException)
@@ -80,8 +80,8 @@ internal class TcpServer
             while (true)
             {
                 var cts = new CancellationTokenSource(TimeSpan.FromSeconds(35));
-                var recLen = await _proxyStream.ReadAsync(_proxyBuff.AsMemory(0, _buffSize), cts.Token);
-                await TcpSendAsync(_clientStream, EnBytes(_proxyBuff[..recLen]));
+                var recLen = await _proxyStream.ReadAsync(_proxyBuff.AsMemory(0, BuffSize), cts.Token);
+                await TcpSendAsync(_clientStream, EncodeBytes(_proxyBuff[..recLen]));
             }
         }
         catch (SocketException)

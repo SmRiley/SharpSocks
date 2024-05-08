@@ -35,9 +35,9 @@ internal class UdpServer
                 {
                     if (_proxyPointList.Contains(receiveInfo.RemoteEndPoint))
                     {
-                        var Header = GetUdpHeader(receiveInfo.RemoteEndPoint);
-                        var Send_Data = Header.Concat(receiveInfo.Buffer).ToArray();
-                        await _callBackAsync(ClientPoint, EnBytes(Send_Data));
+                        var header = GetUdpHeader(receiveInfo.RemoteEndPoint);
+                        var sendData = header.Concat(receiveInfo.Buffer).ToArray();
+                        await _callBackAsync(ClientPoint, EncodeBytes(sendData));
                     }
                 }
                 else

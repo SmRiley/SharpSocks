@@ -5,19 +5,19 @@ namespace Server.Core;
 
 internal class TcpListen
 {
-    private const int buffSize = 1024 * 15;
-    private const int timeout = 1000 * 5;
-    private readonly byte[] _dataBuff = new byte[buffSize];
+    private const int BuffSize = 1024 * 15;
+    private const int Timeout = 1000 * 5;
+    private readonly byte[] _dataBuff = new byte[BuffSize];
     private readonly TcpListener _tcpListener;
-    private readonly UdpListen? udpListen;
+    private readonly UdpListen? _udpListen;
 
     public TcpListen(IPAddress ip, int port, string pass, bool udpSupport = true)
     {
-        Key = GetPassBytes(pass);
+        Key = GenerateUniqueRandomBytes(pass);
         _tcpListener = new TcpListener(ip, port);
         if (udpSupport)
         {
-            udpListen = new UdpListen(port);
+            _udpListen = new UdpListen(port);
         }
         WriteLog($"Socks Service init,Listen on port {port}, udp support status : {udpSupport}");
     }
@@ -30,7 +30,7 @@ internal class TcpListen
             while (true)
             {
                 var tcpClient = await _tcpListener.AcceptTcpClientAsync();
-                tcpClient.ReceiveTimeout = timeout;
+                tcpClient.ReceiveTimeout = Timeout;
                 _ = TcpConnectAsync(tcpClient);
             }
         }
@@ -47,7 +47,7 @@ internal class TcpListen
     /// <param name="data">数据</param>
     private static async Task TcpSendAsync(TcpClient tcpClient, byte[] data)
     {
-        await tcpClient.GetStream().WriteAsync(EnBytes(data));
+        await tcpClient.GetStream().WriteAsync(EncodeBytes(data));
     }
 
     /// <summary>
@@ -60,20 +60,20 @@ internal class TcpListen
         try
         {
             var cts = new CancellationTokenSource(TimeSpan.FromSeconds(35));
-            var recLen = await tcpStream.ReadAsync(_dataBuff.AsMemory(0, buffSize), cts.Token);
+            var recLen = await tcpStream.ReadAsync(_dataBuff.AsMemory(0, BuffSize), cts.Token);
             if (recLen == 0)
             {
                 tcpClient.Dispose();
                 return;
             }
-            var data = DeBytes(_dataBuff[..recLen]);
+            var data = DecodeBytes(_dataBuff[..recLen]);
             var isNoAuth = IsNoAuth(data);
             var type = GetProxyType(data);
             //首次请求建立连接
             if (isNoAuth)
             {
                 WriteLog($"receive connection request from {tcpClient.Client.RemoteEndPoint}");
-                await TcpSendAsync(tcpClient, No_Authentication_Required);
+                await TcpSendAsync(tcpClient, NoAuthenticationRequired);
                 _ = TcpConnectAsync(tcpClient);
             }
             //已建立连接,判断代理目标端信息
@@ -87,11 +87,11 @@ internal class TcpListen
                     if (tcpProxy.Connected)
                     {
                         _ = new TcpServer(tcpClient, tcpProxy);
-                        await TcpSendAsync(tcpClient, Proxy_Success);
+                        await TcpSendAsync(tcpClient, ProxySuccess);
                     }
                     else
                     {
-                        await TcpSendAsync(tcpClient, Connect_Fail);
+                        await TcpSendAsync(tcpClient, ConnectFail);
                         throw new SocketException();
                     }
                 }
@@ -99,11 +99,11 @@ internal class TcpListen
                 {
                     //UDP 
                     //判断是否开启UDP支持及UDP阈值
-                    if (udpListen is not null && UdpListen.SurplusProxyNum > 0)
+                    if (_udpListen is not null && UdpListen.SurplusProxyNum > 0)
                     {
                         //得到客户端开放UDP端口
-                        var ClientPoint = new IPEndPoint(((IPEndPoint)tcpClient.Client.RemoteEndPoint!).Address, proxyInfo.Port);
-                        udpListen.AddServer(ClientPoint, tcpClient);
+                        var clientPoint = new IPEndPoint(((IPEndPoint)tcpClient.Client.RemoteEndPoint!).Address, proxyInfo.Port);
+                        _udpListen.AddServer(clientPoint, tcpClient);
                         byte[] header = GetUdpHeader((IPEndPoint)tcpClient.Client.LocalEndPoint!);
                         await TcpSendAsync(tcpClient, header);
                     }

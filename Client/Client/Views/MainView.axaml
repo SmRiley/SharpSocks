@@ -1,0 +1,64 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:AvaClient.ViewModels"
+             xmlns:viewModels="clr-namespace:Client.ViewModels"
+             mc:Ignorable="d"
+             d:DesignWidth="500"
+             d:DesignHeight="350"
+             x:Class="Client.Views.MainView"
+             x:DataType="viewModels:MainViewModel">
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <viewModels:MainViewModel />
+    </Design.DataContext>
+
+    <StackPanel Margin="50"
+                HorizontalAlignment="Center">
+        <StackPanel Orientation="Horizontal"
+                    Margin="0,0,0,10">
+            <Label Content="IP Address"
+                   Width="100"
+                   HorizontalAlignment="Right"
+                   Margin="0,0,10,0" />
+            <TextBox Width="200"
+                     Text="{Binding IpAddress}" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal"
+                    Margin="0,0,0,10">
+            <Label Content="Port"
+                   Width="100"
+                   HorizontalAlignment="Right"
+                   Margin="0,0,10,0" />
+            <TextBox Width="200"
+                     Text="{Binding Port}" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal"
+                    Margin="0,0,0,10">
+            <Label Content="Password"
+                   Width="100"
+                   HorizontalAlignment="Right"
+                   Margin="0,0,10,0" />
+            <TextBox Width="200"
+                     Text="{Binding Pass}" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal"
+                    Margin="0,0,0,10">
+            <Label Content="Local Port"
+                   Width="100"
+                   HorizontalAlignment="Right"
+                   Margin="0,0,10,0" />
+            <TextBox Width="200"
+                     Text="{Binding LocalPort}" />
+        </StackPanel>
+        <Button Width="250"
+                Margin="20"
+                HorizontalContentAlignment="Center"
+                HorizontalAlignment="Center"
+                Content="{Binding BtnContext}"
+                IsEnabled="{Binding Enable}"
+                Command="{Binding ExecutionProxy}" />
+    </StackPanel>
+</UserControl>

@@ -6,7 +6,7 @@ using System.Text.Json.Nodes;
 
 try
 {
-    JsonArray config = (JsonArray)JsonNode.Parse(await File.ReadAllBytesAsync("Config.json"))!;
+    var config = (JsonArray)JsonNode.Parse(await File.ReadAllBytesAsync("Config.json"))!;
     var tasks = new List<Task>();
     foreach (var node in config)
     {

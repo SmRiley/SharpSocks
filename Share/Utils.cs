@@ -12,28 +12,19 @@ public class Utils
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public static List<byte> GetPassBytes(string key)
+    public static List<byte> GenerateUniqueRandomBytes(string key)
     {
-        int passBytes = 0;
-        foreach (var i in Encoding.UTF8.GetBytes(key))
+        int seed = Encoding.UTF8.GetBytes(key).Sum(b => (int)b);
+        var random = new Random(seed);
+        var uniqueBytes = new HashSet<byte>();
+
+        while (uniqueBytes.Count < 256)
         {
-            passBytes += i;
+            byte randomByte = (byte)random.Next(256);
+            uniqueBytes.Add(randomByte);
         }
-        var random = new Random(passBytes);
-        var Bytes_Pass = new List<byte>();
-        for (int i = 0; i < 256; i++)
-        {
-            byte Random_int = (byte)random.Next(256);
-            if (!Bytes_Pass.Contains(Random_int))
-            {
-                Bytes_Pass.Add(Random_int);
-            }
-            else
-            {
-                i--;
-            }
-        }
-        return Bytes_Pass;
+
+        return uniqueBytes.ToList();
     }
 
     /// <summary>
@@ -41,14 +32,9 @@ public class Utils
     /// </summary>
     /// <param name="bytes"></param>
     /// <returns></returns>
-    public static byte[] EnBytes(byte[] bytes)
+    public static byte[] EncodeBytes(byte[] bytes)
     {
-        var List_Byte = new List<byte>();
-        foreach (var b in bytes)
-        {
-            List_Byte.Add((byte)Key.IndexOf(b));
-        }
-        return List_Byte.ToArray();
+        return bytes.Select(b => (byte)Key.IndexOf(b)).ToArray();
     }
 
     /// <summary>
@@ -56,14 +42,9 @@ public class Utils
     /// </summary>
     /// <param name="bytes"></param>
     /// <returns></returns>
-    public static byte[] DeBytes(byte[] bytes)
+    public static byte[] DecodeBytes(byte[] bytes)
     {
-        var List_Byte = new List<byte>();
-        foreach (var b in bytes)
-        {
-            List_Byte.Add(Key[b]);
-        }
-        return List_Byte.ToArray();
+        return bytes.Select(b => Key[b]).ToArray();
     }
 
     /// <summary>
@@ -71,13 +52,13 @@ public class Utils
     /// </summary>
     /// <param name="tcpClient">待检测对象</param>
     /// <returns></returns>
-    public static bool CheckTcpUsability(TcpClient tcpClient)
+    public static bool CheckTcpClientUsability(TcpClient tcpClient)
     {
         try
         {
-            var foos = IPGlobalProperties.GetIPGlobalProperties()?.GetActiveTcpConnections();
-            var foo = foos?.FirstOrDefault(x => x.LocalEndPoint.Equals(tcpClient.Client?.LocalEndPoint));
-            return foo?.State is TcpState.Established;
+            var activeConnections = IPGlobalProperties.GetIPGlobalProperties()?.GetActiveTcpConnections();
+            var matchingConnection = activeConnections?.FirstOrDefault(x => x.LocalEndPoint.Equals(tcpClient.Client?.LocalEndPoint));
+            return matchingConnection?.State == TcpState.Established;
         }
         catch (NetworkInformationException)
         {
