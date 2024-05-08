@@ -2,7 +2,7 @@
 > 相当于LightSocks的C#版本(一个用于学习目的的Socks5代理)
 >   
  使用C#语言基于.Net 8(服务端) / .Net Avalonia(本地端)实现的Socks5代理  
- 可用于学习了解Socks代理原理和MAUI的简单使用
+ 可用于学习了解Socks代理原理和Avalonia的简单使用
 ### 特点  
 
 - ⚡:轻量级网络混淆代理，基于 SOCKS5 协议.
@@ -17,11 +17,11 @@
 > 出于教学目的,不提供编译好的Release,需自行编译
 
 1. 拉取源码并使用Visual Studio 2022打开(需安装.Net8)  
-2. 对所需平台进行编译(MAUI支持Windows/Android/IOS/Mac)
+2. 对所需平台进行编译(Avalonia支持Windows/Linux/Android/IOS/Mac,项目中只添加了Windows/Android的示例)
 #### 安装
 Client:按生成的对应文件直接安装  
 Server:安装.Net环境,如果发布为独立程序可跳过这一步
-1. [WIndows](https://dotnet.microsoft.com/learn/dotnet/hello-world-tutorial/install "WIndows")
+1. [Windows](https://dotnet.microsoft.com/learn/dotnet/hello-world-tutorial/install "Windows")
 2. [Linux](https://docs.microsoft.com/zh-cn/dotnet/core/install/linux-package-manager-centos7 "Linux")
 
 编辑Config.json,默认文件中为
